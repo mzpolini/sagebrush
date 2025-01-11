@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 const navigation = [
-  { name: "Product", href: "#" },
-  { name: "Features", href: "#" },
+  { name: "Features", href: "/features" },
   { name: "Company", href: "#" },
 ];
 
@@ -22,13 +22,13 @@ export default function Example() {
         <div className="flex flex-1">
           <div className="hidden lg:flex lg:gap-x-12">
             {navigation.map((item) => (
-              <a
+              <Link
                 key={item.name}
                 href={item.href}
                 className="text-sm/6 font-semibold text-gray-900"
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
           </div>
           <div className="flex lg:hidden">
@@ -42,14 +42,14 @@ export default function Example() {
             </button>
           </div>
         </div>
-        <a href="#" className="-m-1.5 p-1.5">
+        <Link href="/" className="-m-1.5 p-1.5">
           <span className="sr-only">Your Company</span>
           <img
             alt=""
             src="https://tailwindui.com/plus/img/logos/mark.svg?color=green&shade=600"
             className="h-8 w-auto"
           />
-        </a>
+        </Link>
         <div className="flex flex-1 justify-end">
           <a href="#" className="text-sm/6 font-semibold text-gray-900">
             Log in <span aria-hidden="true">&rarr;</span>
@@ -74,14 +74,14 @@ export default function Example() {
                 <XMarkIcon aria-hidden="true" className="size-6" />
               </button>
             </div>
-            <a href="#" className="-m-1.5 p-1.5">
-              <span className="sr-only">Your Company</span>
+            <Link href="/" className="-m-1.5 p-1.5">
+              <span className="sr-only">Sage Brush</span>
               <img
                 alt=""
                 src="https://tailwindui.com/plus/img/logos/mark.svg?color=green&shade=600"
                 className="h-8 w-auto"
               />
-            </a>
+            </Link>
             <div className="flex flex-1 justify-end">
               <a href="#" className="text-sm/6 font-semibold text-gray-900">
                 Log in <span aria-hidden="true">&rarr;</span>

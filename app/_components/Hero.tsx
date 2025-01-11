@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Hero() {
   return (
@@ -41,18 +42,19 @@ export default function Hero() {
                   Connecting cannabis opportunities for applicants and investors
                 </p>
                 <div className="mt-10 flex items-center gap-x-6">
-                  <a
-                    href="#"
-                    className="rounded-md bg-green-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-00 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-400"
+                  <Link
+                    href="/features"
+                    className="rounded-md bg-green-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-400"
                   >
                     Get started
-                  </a>
-                  <a
-                    href="#"
-                    className="rounded-md bg-blue-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-400"
+                  </Link>
+
+                  <Link
+                    href="/company"
+                    className="text-sm/6 font-semibold text-gray-900"
                   >
-                    Get started
-                  </a>
+                    Learn more <span aria-hidden="true">→</span>
+                  </Link>
                 </div>
               </div>
             </div>
