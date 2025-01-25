@@ -7,9 +7,10 @@ export type FormState = {
 
 export async function onSubmitAction(data: FormData): Promise<FormState> {
   "use server";
+
   const formData = Object.fromEntries(data);
   const parsed = schema.safeParse(formData);
-
+  console.log("onSubmit:", parsed);
   if (!parsed.success) {
     return {
       message: "Invalid form data",

@@ -7,5 +7,4 @@ export const schema = z.object({
   lastName: z.string().trim().min(1).max(255, {
     message: "Last name must be at least 2 characters long",
   }),
-  email: z.string().email({ message: "Invalid email address" }),
 });

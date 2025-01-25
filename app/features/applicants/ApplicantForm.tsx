@@ -1,18 +1,13 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useFormState } from "react-dom";
 import { useForm, Resolver, SubmitHandler, Controller } from "react-hook-form";
-import Form from "../../../components/forms/Form";
 import { Input } from "../../../components/forms/Input";
 import ExclamationCircleIcon from "@heroicons/react/24/outline/ExclamationCircleIcon";
 import { z } from "zod";
 
 import { schema } from "./formSchema";
 import { onSubmitAction } from "./formSubmit";
-
-type FormValues = {
-  firstName: string;
-  lastName: string;
-};
 
 export default function ApplicantForm() {
   const form = useForm<z.output<typeof schema>>({
@@ -24,7 +19,7 @@ export default function ApplicantForm() {
   });
 
   async function onSubmit(data: z.output<typeof schema>) {
-    console.log("data:", data);
+    console.log("onSubmit data:", data);
     const formData = new FormData();
     formData.append("firstName", data.firstName);
     formData.append("lastName", data.lastName);
@@ -32,7 +27,8 @@ export default function ApplicantForm() {
     console.log(await onSubmitAction(formData));
   }
 
-  console.log("form render data:", form);
+  console.log("firstName:", form.watch("firstName"));
+  console.log("lastName:", form.watch("lastName"));
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <div>
@@ -43,25 +39,11 @@ export default function ApplicantForm() {
           First Name
         </label>
         <div className="mt-2 grid grid-cols-1">
-          <Controller
+          <Input
+            {...form.register("firstName")}
             name="firstName"
-            control={form.control}
-            rules={{
-              minLength: {
-                value: 2,
-                message: "Must be at least 2 letters",
-              },
-              required: {
-                value: true,
-                message: "We need your first name in order to proceed",
-              },
-            }}
-            render={({ field }) => (
-              <Input
-                {...field}
-                className="col-start-1 row-start-1 block w-full rounded-md bg-white py-1.5 pl-3 pr-10 text-base text-red-900 outline outline-1 -outline-offset-1 outline-red-300 placeholder:text-red-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-red-600 sm:pr-9 sm:text-sm/6"
-              />
-            )}
+            type="text"
+            className="col-start-1 row-start-1 block w-full rounded-md bg-white py-1.5 pl-3 pr-10 text-base text-red-900 outline outline-1 -outline-offset-1 outline-red-300 placeholder:text-red-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-red-600 sm:pr-9 sm:text-sm/6"
           />
 
           <ExclamationCircleIcon
@@ -75,15 +57,11 @@ export default function ApplicantForm() {
       </div>
       <div>
         <div className="mt-2 grid grid-cols-1">
-          <Controller
+          <Input
+            type="text"
+            {...form.register("lastName")}
             name="lastName"
-            control={form.control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                className="col-start-1 row-start-1 block w-full rounded-md bg-white py-1.5 pl-3 pr-10 text-base text-red-900 outline outline-1 -outline-offset-1 outline-red-300 placeholder:text-red-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-red-600 sm:pr-9 sm:text-sm/6"
-              />
-            )}
+            className="col-start-1 row-start-1 block w-full rounded-md bg-white py-1.5 pl-3 pr-10 text-base text-red-900 outline outline-1 -outline-offset-1 outline-red-300 placeholder:text-red-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-red-600 sm:pr-9 sm:text-sm/6"
           />
           {/* <ExclamationCircleIcon
             aria-hidden="true"
