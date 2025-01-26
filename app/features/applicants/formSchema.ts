@@ -13,6 +13,8 @@ export const schema = z.object({
   state: z.string().trim().min(1).max(255),
   zip: z.string().trim().min(1).max(255),
   country: z.string().trim().min(1).max(255),
-  username: z.string().trim().min(1).max(255),
+  username: z.string().trim().min(2).max(255, {
+    message: "Username must be at least 2 characters long",
+  }),
   about: z.string().trim().min(1).max(255),
 });
