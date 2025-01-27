@@ -10,12 +10,11 @@ import { schema } from "./formSchema";
 import { onSubmitAction } from "./formSubmit";
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
-import { watch } from "fs";
 
 export default function ApplicantForm() {
   const formRef = useRef<HTMLFormElement>(null);
 
-  const [state, formAction] = useActionState(onSubmitAction, {
+  const [, formAction] = useActionState(onSubmitAction, {
     message: "",
   });
   const form = useForm<z.output<typeof schema>>({
@@ -42,7 +41,7 @@ export default function ApplicantForm() {
         action={formAction}
         onSubmit={() => {
           console.log("submitting");
-          formRef.current?.submit;
+          formRef.current?.submit();
           form.handleSubmit((data) => {
             console.log("data", data);
           });
@@ -337,7 +336,7 @@ export default function ApplicantForm() {
               Notifications
             </h2>
             <p className="mt-1 text-sm/6 text-gray-400">
-              We'll always let you know about important changes, but you pick
+              Well always let you know about important changes, but you pick
               what else you want to hear about.
             </p>
 
