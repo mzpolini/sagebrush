@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { UserButton, SignInButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 
 const navigation = [
@@ -12,6 +13,7 @@ const navigation = [
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, isLoaded } = useUser();
 
   return (
     <header className="bg-background">
@@ -51,12 +53,27 @@ export default function Header() {
           />
         </Link>
         <div className="flex flex-1 justify-end">
-          <Link
-            href="#"
-            className="text-sm/6 font-semibold text-foreground hover:text-primary"
-          >
-            Log in <span aria-hidden="true">&rarr;</span>
-          </Link>
+          {isLoaded && (
+            <>
+              {user ? (
+                <div className="flex items-center gap-4">
+                  <Link
+                    href="/features/applicants"
+                    className="text-sm/6 font-semibold text-foreground hover:text-primary"
+                  >
+                    Profile
+                  </Link>
+                  <UserButton afterSignOutUrl="/" />
+                </div>
+              ) : (
+                <SignInButton mode="modal">
+                  <button className="text-sm/6 font-semibold text-foreground hover:text-primary">
+                    Log in <span aria-hidden="true">&rarr;</span>
+                  </button>
+                </SignInButton>
+              )}
+            </>
+          )}
         </div>
       </nav>
       <Dialog
@@ -86,12 +103,15 @@ export default function Header() {
               />
             </Link>
             <div className="flex flex-1 justify-end">
-              <Link
-                href="#"
-                className="text-sm/6 font-semibold text-foreground hover:text-primary"
-              >
-                Log in <span aria-hidden="true">&rarr;</span>
-              </Link>
+              {isLoaded && user ? (
+                <UserButton afterSignOutUrl="/" />
+              ) : (
+                <SignInButton mode="modal">
+                  <button className="text-sm/6 font-semibold text-foreground hover:text-primary">
+                    Log in <span aria-hidden="true">&rarr;</span>
+                  </button>
+                </SignInButton>
+              )}
             </div>
           </div>
           <div className="mt-6 space-y-2">

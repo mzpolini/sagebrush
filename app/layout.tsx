@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import { Outfit, Source_Sans_3, Geist_Mono } from "next/font/google";
 import Header from "./_components/Header";
 import "./globals.css";
@@ -34,8 +35,10 @@ export default function RootLayout({
       className={`${sourceSans.variable} ${outfit.variable} ${geistMono.variable}`}
     >
       <body>
-        <Header />
-        {children}
+        <ClerkProvider>
+          <Header />
+          {children}
+        </ClerkProvider>
       </body>
     </html>
   );
