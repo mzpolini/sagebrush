@@ -5,6 +5,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { Input } from "../../../components/forms/Input";
 import ExclamationCircleIcon from "@heroicons/react/24/outline/ExclamationCircleIcon";
 import { z } from "zod";
+import { cn } from "../../../lib/utils";
 
 import { schema } from "./formSchema";
 import { onSubmitAction } from "./formSubmit";
@@ -31,6 +32,7 @@ export default function ApplicantForm() {
       zip: "12345",
       country: "United States",
     },
+    mode: "onBlur",
   });
   console.log("errors", form.formState.errors);
   console.log("form", form.watch());
@@ -66,20 +68,15 @@ export default function ApplicantForm() {
                   Username
                 </label>
                 <div className="mt-2">
-                  <div className="flex items-center rounded-md bg-background-secondary pl-3 outline outline-1 -outline-offset-1 outline-border focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary">
-                    <div className="shrink-0 select-none text-base text-foreground-muted sm:text-sm/6">
+                  <div className="flex rounded-md bg-background-secondary outline outline-1 -outline-offset-1 outline-border focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary">
+                    <span className="flex select-none items-center pl-3 text-foreground-muted sm:text-sm/6">
                       sagebrush.io/
-                    </div>
+                    </span>
                     <Input
                       {...form.register("username")}
-                      className="block min-w-0 grow bg-transparent py-1.5 pl-1 pr-3 text-base sm:text-sm/6"
+                      error={form.formState.errors.username?.message}
+                      className="block min-w-0 flex-1 border-0 bg-transparent py-1.5 pl-1 focus:ring-0"
                     />
-                    {form.formState.errors.username && (
-                      <ExclamationCircleIcon
-                        aria-hidden="true"
-                        className="size-5 text-primary"
-                      />
-                    )}
                   </div>
                 </div>
               </div>
@@ -176,9 +173,7 @@ export default function ApplicantForm() {
                 <div className="mt-2">
                   <Input
                     {...form.register("firstName")}
-                    name="firstName"
-                    type="text"
-                    className="block w-full rounded-md bg-background-secondary px-3 py-1.5 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-foreground-muted focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
+                    error={form.formState.errors.firstName?.message}
                   />
                 </div>
               </div>
@@ -193,9 +188,7 @@ export default function ApplicantForm() {
                 <div className="mt-2">
                   <Input
                     {...form.register("lastName")}
-                    name="lastName"
-                    type="text"
-                    className="block w-full rounded-md bg-background-secondary px-3 py-1.5 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-foreground-muted focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
+                    error={form.formState.errors.lastName?.message}
                   />
                 </div>
               </div>
@@ -210,11 +203,9 @@ export default function ApplicantForm() {
                 <div className="mt-2">
                   <Input
                     {...form.register("email")}
-                    id="email"
-                    name="email"
+                    error={form.formState.errors.email?.message}
                     type="email"
                     autoComplete="email"
-                    className="block w-full rounded-md bg-background-secondary px-3 py-1.5 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-foreground-muted focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
                   />
                 </div>
               </div>
