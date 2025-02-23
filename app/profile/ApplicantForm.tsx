@@ -2,13 +2,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRef, useActionState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Input } from "../../../components/forms/Input";
+import { Input } from "../../components/forms/Input";
 import ExclamationCircleIcon from "@heroicons/react/24/outline/ExclamationCircleIcon";
 import { z } from "zod";
-import { cn } from "../../../lib/utils";
+import { cn } from "../../lib/utils";
 
-import { schema } from "./formSchema";
-import { onSubmitAction } from "./formSubmit";
+import { schema } from "../features/applicants/formSchema";
+import { onSubmitAction } from "../features/applicants/formSubmit";
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 

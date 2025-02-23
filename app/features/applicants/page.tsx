@@ -1,9 +1,5 @@
-import ApplicantForm from "./ApplicantForm";
+import { redirect } from "next/navigation";
 
-export default function Example() {
-  return (
-    <div className="p-7">
-      <ApplicantForm />
-    </div>
-  );
+export default function ApplicantsPage() {
+  redirect("/profile");
 }
