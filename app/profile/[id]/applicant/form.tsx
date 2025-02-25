@@ -7,7 +7,7 @@ import { schema, type FormData } from "./schema";
 import { onSubmitAction } from "./submit";
 
 export default function ApplicantForm() {
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     mode: "onBlur",

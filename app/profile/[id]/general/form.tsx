@@ -3,9 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRef, useActionState, useTransition } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { Input } from "@/components/forms/Input";
-import ExclamationCircleIcon from "@heroicons/react/24/outline/ExclamationCircleIcon";
 import { z } from "zod";
-import { cn } from "@/lib/utils";
 import { schema, type FormData } from "./schema";
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
@@ -32,11 +30,11 @@ interface Props {
 
 export default function ApplicantForm({ initialData }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
-  const [isPending, startTransition] = useTransition();
-  const [state, formAction] = useActionState<
-    ActionState,
-    z.output<typeof schema>
-  >(onSubmitAction, { message: "" });
+  const [, startTransition] = useTransition();
+  const [, formAction] = useActionState<ActionState, z.output<typeof schema>>(
+    onSubmitAction,
+    { message: "" }
+  );
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),

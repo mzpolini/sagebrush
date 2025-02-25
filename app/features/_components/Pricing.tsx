@@ -45,7 +45,7 @@ export default function Pricing() {
         </div>
         <div className="relative mt-6">
           <p className="mx-auto max-w-2xl text-pretty text-lg font-medium text-foreground-secondary sm:text-xl/8">
-            Choose an affordable plan that's packed with the best features for
+            Choose an affordable plan thats packed with the best features for
             engaging your audience, creating customer loyalty, and driving
             sales.
           </p>
