@@ -1,23 +1,26 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRef, useActionState } from "react";
+import { useRef, useActionState, useTransition } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Input } from "../../components/forms/Input";
+import { Input } from "@/components/forms/Input";
 import ExclamationCircleIcon from "@heroicons/react/24/outline/ExclamationCircleIcon";
 import { z } from "zod";
-import { cn } from "../../lib/utils";
-
-import { schema } from "../features/applicants/formSchema";
-import { onSubmitAction } from "../features/applicants/formSubmit";
+import { cn } from "@/lib/utils";
+import { schema } from "./schema";
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
+import { onSubmitAction } from "./submit";
+
+type ActionState = { message: string };
 
 export default function ApplicantForm() {
   const formRef = useRef<HTMLFormElement>(null);
+  const [isPending, startTransition] = useTransition();
+  const [state, formAction] = useActionState<ActionState, FormData>(
+    onSubmitAction,
+    { message: "" }
+  );
 
-  const [, formAction] = useActionState(onSubmitAction, {
-    message: "",
-  });
   const form = useForm<z.output<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -34,21 +37,22 @@ export default function ApplicantForm() {
     },
     mode: "onBlur",
   });
+
+  const onSubmit = form.handleSubmit((data) => {
+    startTransition(async () => {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (value) formData.append(key, value);
+      });
+      await formAction(formData);
+    });
+  });
+
   console.log("errors", form.formState.errors);
   console.log("form", form.watch());
   return (
     <FormProvider {...form}>
-      <form
-        ref={formRef}
-        action={formAction}
-        onSubmit={() => {
-          console.log("submitting");
-          formRef.current?.submit();
-          form.handleSubmit((data) => {
-            console.log("data", data);
-          });
-        }}
-      >
+      <form ref={formRef} onSubmit={onSubmit}>
         <div className="space-y-12">
           <div className="border-b border-border pb-12">
             <h2 className="font-display text-lg font-semibold text-foreground">

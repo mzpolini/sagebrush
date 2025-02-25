@@ -22,10 +22,11 @@ export async function syncUser() {
 }
 
 export async function updateUserProfile(formData: FormData) {
-  const { userId } = await auth();
+  // const { userId } = await auth();
+  const userId = "user_2p345678901234567890123456789012";
   if (!userId) throw new Error("Unauthorized");
-
   const data = Object.fromEntries(formData);
+  console.log("updateUserProfile called with data", JSON.stringify(data));
 
   // First try to insert a new user
   const newUser = await db
