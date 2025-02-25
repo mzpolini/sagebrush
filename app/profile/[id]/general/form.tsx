@@ -6,34 +6,51 @@ import { Input } from "@/components/forms/Input";
 import ExclamationCircleIcon from "@heroicons/react/24/outline/ExclamationCircleIcon";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
-import { schema } from "./schema";
+import { schema, type FormData } from "./schema";
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { onSubmitAction } from "./submit";
 
 type ActionState = { message: string };
 
-export default function ApplicantForm() {
+interface Props {
+  initialData?: {
+    id: string;
+    clerkId: string;
+    email: string;
+    firstName: string | null;
+    lastName: string | null;
+    username: string | null;
+    about: string | null;
+    address: string | null;
+    city: string | null;
+    state: string | null;
+    zip: string | null;
+    country: string | null;
+  };
+}
+
+export default function ApplicantForm({ initialData }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isPending, startTransition] = useTransition();
-  const [state, formAction] = useActionState<ActionState, FormData>(
-    onSubmitAction,
-    { message: "" }
-  );
+  const [state, formAction] = useActionState<
+    ActionState,
+    z.output<typeof schema>
+  >(onSubmitAction, { message: "" });
 
-  const form = useForm<z.output<typeof schema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      firstName: "John",
-      lastName: "Brown",
-      email: "jb@jb.com",
-      username: "jb",
-      about: "I am a developer",
-      address: "123 Main St",
-      city: "Anytown",
-      state: "CA",
-      zip: "12345",
-      country: "United States",
+      firstName: initialData?.firstName ?? "",
+      lastName: initialData?.lastName ?? "",
+      email: initialData?.email ?? "",
+      username: initialData?.username ?? "",
+      about: initialData?.about ?? "",
+      address: initialData?.address ?? "",
+      city: initialData?.city ?? "",
+      state: initialData?.state ?? "",
+      zip: initialData?.zip ?? "",
+      country: initialData?.country ?? "",
     },
     mode: "onBlur",
   });
@@ -44,7 +61,7 @@ export default function ApplicantForm() {
       Object.entries(data).forEach(([key, value]) => {
         if (value) formData.append(key, value);
       });
-      await formAction(formData);
+      formAction(data);
     });
   });
 

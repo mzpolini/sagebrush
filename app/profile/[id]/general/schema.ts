@@ -84,3 +84,5 @@ export const schema = z.object({
     })
     .max(255),
 });
+
+export type FormData = z.infer<typeof schema>;

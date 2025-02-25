@@ -2,8 +2,9 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/app/db/drizzle";
-import { users } from "@/app/db/schema";
+import { users, applicantProfiles, investorProfiles } from "@/app/db/schema";
 import { eq } from "drizzle-orm";
+import { query } from "@/app/db/query";
 
 export async function syncUser() {
   const { userId } = await auth();
@@ -94,4 +95,31 @@ export async function testInsertUser() {
     .returning();
 
   return testUser[0];
+}
+
+export async function getUserProfile(userId: string) {
+  const user = await query.users.findFirst({
+    where: eq(users.clerkId, userId),
+  });
+
+  if (!user) return null;
+
+  const [applicantProfile, investorProfile] = await Promise.all([
+    db
+      .select()
+      .from(applicantProfiles)
+      .where(eq(applicantProfiles.userId, user.id))
+      .limit(1),
+    db
+      .select()
+      .from(investorProfiles)
+      .where(eq(investorProfiles.userId, user.id))
+      .limit(1),
+  ]);
+
+  return {
+    ...user,
+    applicantProfile: applicantProfile[0] || null,
+    investorProfile: investorProfile[0] || null,
+  };
 }

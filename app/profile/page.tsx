@@ -1,8 +1,10 @@
-export default function ProfilePage() {
-  return (
-    <div>
-      <h1>Profile</h1>
-      <div className="flex">Profile Page</div>
-    </div>
-  );
+import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
+
+export default async function ProfilePage() {
+  const { userId } = await auth();
+  if (!userId) redirect("/sign-in");
+
+  // Redirect to user's profile
+  redirect(`/profile/${userId}/general`);
 }

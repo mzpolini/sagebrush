@@ -1,3 +1,5 @@
-export default function ProfilePage() {
-  return <div>Generic Profile Landing Page</div>;
+import { redirect } from "next/navigation";
+
+export default function ProfileIdPage() {
+  redirect("./general");
 }
