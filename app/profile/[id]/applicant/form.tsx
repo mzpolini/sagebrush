@@ -17,7 +17,13 @@ export default function ApplicantForm() {
     startTransition(async () => {
       const formData = new FormData();
       Object.entries(data).forEach(([key, value]) => {
-        if (value) formData.append(key, value);
+        if (value) {
+          if (Array.isArray(value)) {
+            value.forEach((v) => formData.append(key, v));
+          } else {
+            formData.append(key, value);
+          }
+        }
       });
       await onSubmitAction(formData);
     });
@@ -26,7 +32,6 @@ export default function ApplicantForm() {
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <Input
-        label="Experience"
         {...form.register("experience")}
         error={form.formState.errors.experience?.message}
       />
