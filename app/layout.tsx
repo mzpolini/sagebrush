@@ -30,16 +30,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${sourceSans.variable} ${outfit.variable} ${geistMono.variable}`}
+    <ClerkProvider
+      appearance={{
+        variables: { colorPrimary: "#000000" },
+      }}
+      afterSignInUrl="/profile"
+      afterSignUpUrl="/profile"
     >
-      <body>
-        <ClerkProvider>
+      <html
+        lang="en"
+        className={`${sourceSans.variable} ${outfit.variable} ${geistMono.variable} antialiased`}
+      >
+        <body>
           <Header />
           {children}
-        </ClerkProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

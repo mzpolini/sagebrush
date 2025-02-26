@@ -98,28 +98,26 @@ export async function testInsertUser() {
 }
 
 export async function getUserProfile(userId: string) {
-  const user = await query.users.findFirst({
-    where: eq(users.clerkId, userId),
+  const authData = await auth();
+  console.log("Full auth data:", {
+    userId: authData.userId,
+    sessionId: authData.sessionId,
+    sessionClaims: authData.sessionClaims,
   });
 
-  if (!user) return null;
+  if (!authData.userId) return null;
 
-  const [applicantProfile, investorProfile] = await Promise.all([
-    db
-      .select()
-      .from(applicantProfiles)
-      .where(eq(applicantProfiles.userId, user.id))
-      .limit(1),
-    db
-      .select()
-      .from(investorProfiles)
-      .where(eq(investorProfiles.userId, user.id))
-      .limit(1),
-  ]);
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.clerkId, authData.userId))
+    .execute();
+
+  console.log("Found user in DB:", user?.[0]);
+
+  if (!user?.[0]) return null;
 
   return {
-    ...user,
-    applicantProfile: applicantProfile[0] || null,
-    investorProfile: investorProfile[0] || null,
+    ...user[0],
   };
 }

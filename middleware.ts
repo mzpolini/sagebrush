@@ -1,12 +1,30 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { syncUserWithDatabase } from "@/app/actions/auth";
 
-export default clerkMiddleware();
+const isDashboardRoute = createRouteMatcher(["/profile(.*)"]);
+const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)"]);
+
+export default clerkMiddleware(
+  async (auth, req) => {
+    const { userId, redirectToSignIn } = await auth();
+
+    if (isPublicRoute(req)) return;
+
+    // Protect dashboard and other private routes
+    if (isDashboardRoute(req)) {
+      await auth.protect();
+      await fetch(new URL("/api/auth/sync", req.url), { method: "POST" });
+    }
+
+    // Optional: Redirect root to dashboard for authenticated users
+    if (req.nextUrl.pathname === "/" && userId) {
+      const dashboard = new URL(`/profile/${userId}/dashboard/`, req.url);
+      return Response.redirect(dashboard);
+    }
+  }
+  // { debug: true }
+);
 
 export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
-  ],
+  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };

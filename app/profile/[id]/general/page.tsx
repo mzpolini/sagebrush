@@ -7,7 +7,7 @@ export default async function GeneralPage() {
   if (!userId) throw new Error("Unauthorized");
 
   const userData = await getUserProfile(userId);
-
+  console.log("userData", userData);
   // Only pass the user fields needed by the form
   const initialData = userData
     ? {
