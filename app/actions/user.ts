@@ -64,44 +64,8 @@ export async function updateUserProfile(formData: FormData) {
   return newUser[0];
 }
 
-export async function testInsertUser() {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const testUser = await db
-    .insert(users)
-    .values({
-      clerkId: userId,
-      email: "test@example.com",
-      firstName: "Test",
-      lastName: "User",
-      username: "testuser",
-      about: "This is a test user",
-      address: "123 Test St",
-      city: "Test City",
-      state: "TS",
-      zip: "12345",
-      country: "Test Country",
-    })
-    .onConflictDoUpdate({
-      target: users.clerkId,
-      set: {
-        email: "test@example.com",
-        updatedAt: new Date(),
-      },
-    })
-    .returning();
-
-  return testUser[0];
-}
-
 export async function getUserProfile(userId: string) {
   const authData = await auth();
-  console.log("Full auth data:", {
-    userId: authData.userId,
-    sessionId: authData.sessionId,
-    sessionClaims: authData.sessionClaims,
-  });
 
   if (!authData.userId) return null;
 
@@ -110,8 +74,6 @@ export async function getUserProfile(userId: string) {
     .from(users)
     .where(eq(users.clerkId, authData.userId))
     .execute();
-
-  console.log("Found user in DB:", user?.[0]);
 
   if (!user?.[0]) return null;
 
