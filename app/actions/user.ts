@@ -23,8 +23,7 @@ export async function syncUser() {
 }
 
 export async function updateUserProfile(formData: FormData) {
-  // const { userId } = await auth();
-  const userId = "user_2p345678901234567890123456789012";
+  const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
   const data = Object.fromEntries(formData);
   console.log("updateUserProfile called with data", JSON.stringify(data));
@@ -51,7 +50,6 @@ export async function updateUserProfile(formData: FormData) {
         email: data.email as string,
         firstName: data.firstName as string,
         lastName: data.lastName as string,
-        username: data.username as string,
         about: data.about as string,
         address: data.address as string,
         city: data.city as string,
