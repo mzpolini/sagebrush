@@ -11,24 +11,24 @@ module.exports = {
     extend: {
       colors: {
         background: {
-          DEFAULT: "#1a1f1c", // Deep forest black
-          secondary: "rgb(52 65 57 / 0.15)", // Sage green tint
+          DEFAULT: "#1c2321", // Rich forest background
+          secondary: "rgb(44 57 51 / 0.15)", // Deep moss overlay
         },
         foreground: {
-          DEFAULT: "#e5ebe7", // Soft sage white
-          secondary: "#94a196", // Muted sage
-          muted: "#5f6d63", // Deep sage
+          DEFAULT: "#ecf0ed", // Clean paper white
+          secondary: "#9cb0a4", // Sage mist
+          muted: "#5c6b65", // Forest shadow
         },
-        border: "rgb(147 162 150 / 0.2)", // Sage border
+        border: "rgb(156 176 164 / 0.2)", // Misty border
         primary: {
-          DEFAULT: "#2dd4bf", // Vibrant teal
-          foreground: "#1a1f1c", // Dark on light
-          hover: "#5eead4", // Lighter teal
+          DEFAULT: "#2c7a7b", // Deep teal (more natural)
+          foreground: "#1c2321", // Dark forest on light
+          hover: "#38a89d", // Ocean teal
         },
         secondary: {
-          DEFAULT: "rgb(52 65 57 / 0.3)", // Sage overlay
-          foreground: "#e5ebe7", // Light on dark
-          hover: "rgb(52 65 57 / 0.4)", // Darker sage overlay
+          DEFAULT: "rgb(44 57 51 / 0.3)", // Forest overlay
+          foreground: "#ecf0ed", // Clean white on dark
+          hover: "rgb(44 57 51 / 0.4)", // Deep forest overlay
         },
       },
       opacity: {
