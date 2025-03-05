@@ -278,7 +278,7 @@ export default async function Dashboard({
           </ul>
         ) : (
           <p className="text-gray-700">
-            Based on your investment preferences, we'll show matching
+            Based on your investment preferences, we&apos;ll show matching
             opportunities here once you complete your profile.
           </p>
         )}
