@@ -86,13 +86,14 @@ export const applicantProfilesRelations = relations(
 // Investor profile with relation to users
 export const investorProfiles = pgTable("investor_profiles", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
+  userId: varchar("user_id", { length: 255 }).notNull(),
   investmentRange: text("investment_range"),
   investmentStyle: text("investment_style"),
   preferredLocations: jsonb("preferred_locations").$type<string[]>(),
   accreditedStatus: boolean("accredited_status"),
+  investmentGoals: text("investment_goals"),
+  investmentHistory: text("investment_history"),
+  riskTolerance: text("risk_tolerance"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -103,7 +104,7 @@ export const investorProfilesRelations = relations(
   ({ one }) => ({
     user: one(users, {
       fields: [investorProfiles.userId],
-      references: [users.id],
+      references: [users.clerkId],
     }),
   })
 );

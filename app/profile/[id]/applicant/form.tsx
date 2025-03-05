@@ -20,9 +20,9 @@ interface Props {
     securityPlan?: string;
     businessPlan?: string;
     status?: string;
-    createdAt?: Date;
-    updatedAt?: Date;
-  };
+    createdAt?: Date | null;
+    updatedAt?: Date | null;
+  } | null;
 }
 
 export default function ApplicantForm({ initialData }: Props = {}) {

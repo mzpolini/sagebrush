@@ -138,3 +138,78 @@ export async function submitApplicantProfile(formData: FormData) {
     throw new Error("Failed to submit application. Please try again.");
   }
 }
+
+export async function getInvestorProfile(userId: string) {
+  const authData = await auth();
+
+  if (!authData.userId) return null;
+
+  const profiles = await db
+    .select()
+    .from(investorProfiles)
+    .where(eq(investorProfiles.userId, authData.userId))
+    .limit(1);
+
+  return profiles.length > 0 ? profiles[0] : null;
+}
+
+export async function submitInvestorProfile(formData: FormData) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("You must be logged in to submit an investor profile");
+  }
+
+  const data = Object.fromEntries(formData.entries());
+
+  // Extract the profile ID from the URL
+  const url = new URL(formData.get("url") as string);
+  const profileId = url.pathname.split("/")[2];
+
+  // Convert preferredLocations from FormData to array
+  const preferredLocationsEntries = Array.from(formData.entries())
+    .filter(([key]) => key === "preferredLocations")
+    .map(([_, value]) => value as string);
+
+  try {
+    // Check if profile already exists
+    const existingProfile = await getInvestorProfile(userId);
+
+    if (existingProfile) {
+      // Update existing profile
+      await db
+        .update(investorProfiles)
+        .set({
+          investmentRange: data.investmentRange as string,
+          investmentStyle: data.investmentStyle as string,
+          preferredLocations: preferredLocationsEntries,
+          accreditedStatus: data.accreditedStatus === "true",
+          investmentGoals: data.investmentGoals as string,
+          investmentHistory: data.investmentHistory as string,
+          riskTolerance: data.riskTolerance as string,
+          updatedAt: new Date(),
+        })
+        .where(eq(investorProfiles.id, existingProfile.id));
+    } else {
+      // Create new profile
+      await db.insert(investorProfiles).values({
+        userId, // This is the Clerk user ID
+        investmentRange: data.investmentRange as string,
+        investmentStyle: data.investmentStyle as string,
+        preferredLocations: preferredLocationsEntries,
+        accreditedStatus: data.accreditedStatus === "true",
+        investmentGoals: data.investmentGoals as string,
+        investmentHistory: data.investmentHistory as string,
+        riskTolerance: data.riskTolerance as string,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    }
+
+    revalidatePath(`/profile/${profileId}/investor`);
+    redirect(`/profile/${profileId}/dashboard`);
+  } catch (error) {
+    console.error("Error submitting investor profile:", error);
+    throw new Error("Failed to submit investor profile. Please try again.");
+  }
+}
