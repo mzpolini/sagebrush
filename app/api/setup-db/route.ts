@@ -56,10 +56,14 @@ export async function GET() {
       message: "Database tables updated",
       tables: tables.rows,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error updating table:", error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      {
+        success: false,
+        error:
+          error instanceof Error ? error.message : "An unknown error occurred",
+      },
       { status: 500 }
     );
   }

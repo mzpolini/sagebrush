@@ -5,7 +5,6 @@ import {
   uuid,
   boolean,
   jsonb,
-  integer,
   serial,
   varchar,
 } from "drizzle-orm/pg-core";

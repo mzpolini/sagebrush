@@ -1,13 +1,13 @@
 import { auth } from "@clerk/nextjs/server";
 import { getApplicantProfile } from "@/app/actions/user";
 import ApplicantForm from "./form";
+import { redirect } from "next/navigation";
 
-export default async function ApplicantPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function ApplicantPage() {
   const { userId } = await auth();
+  if (!userId) {
+    redirect("/sign-in");
+  }
   const existingApplication = userId ? await getApplicantProfile(userId) : null;
 
   return (

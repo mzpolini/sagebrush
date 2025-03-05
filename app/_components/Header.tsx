@@ -58,7 +58,7 @@ export default function Header() {
               {user ? (
                 <div className="flex items-center gap-4">
                   <Link
-                    href="/features/applicants"
+                    href="/profile"
                     className="text-sm/6 font-semibold text-foreground hover:text-primary"
                   >
                     Profile

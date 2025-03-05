@@ -1,13 +1,13 @@
 import { auth } from "@clerk/nextjs/server";
 import { getInvestorProfile } from "@/app/actions/user";
 import InvestorForm from "./form";
+import { redirect } from "next/navigation";
 
-export default async function InvestorPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function InvestorPage() {
   const { userId } = await auth();
+  if (!userId) {
+    redirect("/sign-in");
+  }
   const existingProfile = userId ? await getInvestorProfile(userId) : null;
 
   return (

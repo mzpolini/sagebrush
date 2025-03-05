@@ -2,14 +2,8 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/app/db/drizzle";
-import {
-  users,
-  applicantProfiles,
-  investorProfiles,
-  applicants,
-} from "@/app/db/schema";
+import { users, investorProfiles, applicants } from "@/app/db/schema";
 import { eq } from "drizzle-orm";
-import { query } from "@/app/db/query";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -72,14 +66,12 @@ export async function updateUserProfile(formData: FormData) {
 }
 
 export async function getUserProfile(userId: string) {
-  const authData = await auth();
-
-  if (!authData.userId) return null;
+  if (!userId) return null;
 
   const user = await db
     .select()
     .from(users)
-    .where(eq(users.clerkId, authData.userId))
+    .where(eq(users.clerkId, userId))
     .execute();
 
   if (!user?.[0]) return null;
@@ -90,14 +82,12 @@ export async function getUserProfile(userId: string) {
 }
 
 export async function getApplicantProfile(userId: string) {
-  const authData = await auth();
-
-  if (!authData.userId) return null;
+  if (!userId) return null;
 
   const applications = await db
     .select()
     .from(applicants)
-    .where(eq(applicants.userId, authData.userId))
+    .where(eq(applicants.userId, userId))
     .limit(1);
 
   return applications.length > 0 ? applications[0] : null;
@@ -140,14 +130,12 @@ export async function submitApplicantProfile(formData: FormData) {
 }
 
 export async function getInvestorProfile(userId: string) {
-  const authData = await auth();
-
-  if (!authData.userId) return null;
+  if (!userId) return null;
 
   const profiles = await db
     .select()
     .from(investorProfiles)
-    .where(eq(investorProfiles.userId, authData.userId))
+    .where(eq(investorProfiles.userId, userId))
     .limit(1);
 
   return profiles.length > 0 ? profiles[0] : null;
@@ -169,7 +157,7 @@ export async function submitInvestorProfile(formData: FormData) {
   // Convert preferredLocations from FormData to array
   const preferredLocationsEntries = Array.from(formData.entries())
     .filter(([key]) => key === "preferredLocations")
-    .map(([_, value]) => value as string);
+    .map(([, value]) => value as string);
 
   try {
     // Check if profile already exists

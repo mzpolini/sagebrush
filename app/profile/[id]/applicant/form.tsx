@@ -2,8 +2,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
 import { useRef, useTransition } from "react";
-import { usePathname } from "next/navigation";
-import { Input } from "@/components/forms/Input";
 import { schema, type FormData } from "./schema";
 import { onSubmitAction } from "./submit";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
@@ -27,7 +25,6 @@ interface Props {
 
 export default function ApplicantForm({ initialData }: Props = {}) {
   const [isPending, startTransition] = useTransition();
-  const pathname = usePathname();
   const formRef = useRef<HTMLFormElement>(null);
 
   const form = useForm<FormData>({

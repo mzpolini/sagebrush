@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 
-export async function up(db) {
+export async function up(db: PostgresJsDatabase) {
   await db.execute(sql`
     CREATE TABLE IF NOT EXISTS applicants (
       id SERIAL PRIMARY KEY,
@@ -29,6 +30,6 @@ export async function up(db) {
   `);
 }
 
-export async function down(db) {
+export async function down(db: PostgresJsDatabase) {
   await db.execute(sql`DROP TABLE IF EXISTS applicants;`);
 }

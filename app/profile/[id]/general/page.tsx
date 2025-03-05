@@ -11,7 +11,7 @@ export default async function GeneralPage() {
   // Only pass the user fields needed by the form
   const initialData = userData
     ? {
-        id: userData.id,
+        id: String(userData.id),
         clerkId: userData.clerkId,
         email: userData.email,
         firstName: userData.firstName,
