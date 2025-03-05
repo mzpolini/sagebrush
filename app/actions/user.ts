@@ -2,9 +2,16 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/app/db/drizzle";
-import { users, applicantProfiles, investorProfiles } from "@/app/db/schema";
+import {
+  users,
+  applicantProfiles,
+  investorProfiles,
+  applicants,
+} from "@/app/db/schema";
 import { eq } from "drizzle-orm";
 import { query } from "@/app/db/query";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function syncUser() {
   const { userId } = await auth();
@@ -80,4 +87,54 @@ export async function getUserProfile(userId: string) {
   return {
     ...user[0],
   };
+}
+
+export async function getApplicantProfile(userId: string) {
+  const authData = await auth();
+
+  if (!authData.userId) return null;
+
+  const applications = await db
+    .select()
+    .from(applicants)
+    .where(eq(applicants.userId, authData.userId))
+    .limit(1);
+
+  return applications.length > 0 ? applications[0] : null;
+}
+
+export async function submitApplicantProfile(formData: FormData) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("You must be logged in to submit an application");
+  }
+
+  const data = Object.fromEntries(formData.entries());
+
+  // Extract the profile ID from the URL
+  const url = new URL(formData.get("url") as string);
+  const profileId = url.pathname.split("/")[2];
+
+  try {
+    await db.insert(applicants).values({
+      userId,
+      profileId,
+      licenseType: data.licenseType as string,
+      experience: data.experience as string,
+      criminalHistory: (data.criminalHistory as string) || null,
+      financialInvestment: data.financialInvestment as string,
+      securityPlan: data.securityPlan as string,
+      businessPlan: data.businessPlan as string,
+      status: "pending",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    revalidatePath(`/profile/${profileId}/applicant`);
+    redirect(`/profile/${profileId}/dashboard`);
+  } catch (error) {
+    console.error("Error submitting application:", error);
+    throw new Error("Failed to submit application. Please try again.");
+  }
 }

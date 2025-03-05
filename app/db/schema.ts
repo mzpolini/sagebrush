@@ -5,36 +5,55 @@ import {
   uuid,
   boolean,
   jsonb,
+  integer,
+  serial,
+  varchar,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 // Base user table
 export const users = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  clerkId: text("clerk_id").unique().notNull(),
-  email: text("email").unique().notNull(),
-  firstName: text("first_name"),
-  lastName: text("last_name"),
-  username: text("username").unique(),
+  id: serial("id").primaryKey(),
+  clerkId: varchar("clerk_id", { length: 255 }).notNull().unique(),
+  email: varchar("email", { length: 255 }).notNull(),
+  firstName: varchar("first_name", { length: 255 }),
+  lastName: varchar("last_name", { length: 255 }),
+  username: varchar("username", { length: 255 }),
   about: text("about"),
-  address: text("address"),
-  city: text("city"),
-  state: text("state"),
-  zip: text("zip"),
-  country: text("country"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  address: varchar("address", { length: 255 }),
+  city: varchar("city", { length: 255 }),
+  state: varchar("state", { length: 255 }),
+  zip: varchar("zip", { length: 255 }),
+  country: varchar("country", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Define relations for users
-export const usersRelations = relations(users, ({ one }) => ({
-  applicantProfile: one(applicantProfiles, {
-    fields: [users.id],
-    references: [applicantProfiles.userId],
-  }),
-  investorProfile: one(investorProfiles, {
-    fields: [users.id],
-    references: [investorProfiles.userId],
+// New applicants table
+export const applicants = pgTable("applicants", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id", { length: 255 }).notNull(),
+  profileId: varchar("profile_id", { length: 255 }).notNull(),
+  licenseType: varchar("license_type", { length: 255 }).notNull(),
+  experience: text("experience").notNull(),
+  criminalHistory: text("criminal_history"),
+  financialInvestment: text("financial_investment").notNull(),
+  securityPlan: text("security_plan").notNull(),
+  businessPlan: text("business_plan").notNull(),
+  status: varchar("status", { length: 255 }).notNull().default("pending"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Define relations
+export const usersRelations = relations(users, ({ many }) => ({
+  applicants: many(applicants),
+}));
+
+export const applicantsRelations = relations(applicants, ({ one }) => ({
+  user: one(users, {
+    fields: [applicants.userId],
+    references: [users.clerkId],
   }),
 }));
 
