@@ -1,11 +1,18 @@
-// src/db.ts
+// Database client configuration for Neon + Drizzle ORM
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
-import { config } from "dotenv";
+import * as schema from "./schema";
 
-config({ path: ".env" }); // or .env.local
+// Validate environment variable at module load time
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL must be a Neon postgres connection string");
+}
 
-const sql = neon(process.env.DATABASE_URL!);
+// Create Neon HTTP client (optimized for serverless/Edge Runtime)
+const sql = neon(process.env.DATABASE_URL);
+
+// Export database instance with schema for type-safe queries and relations
 export const db = drizzle(sql, {
-  logger: true, // Enable query logging
+  schema,
+  logger: true, // Enable query logging in development
 });

@@ -57,7 +57,7 @@ export async function updateUserProfile(formData: FormData) {
         state: data.state as string,
         zip: data.zip as string,
         country: data.country as string,
-        updatedAt: new Date(),
+        // updatedAt auto-updates via .$onUpdate() in schema
       },
     })
     .returning();
@@ -117,8 +117,7 @@ export async function submitApplicantProfile(formData: FormData) {
       securityPlan: data.securityPlan as string,
       businessPlan: data.businessPlan as string,
       status: "pending",
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      // createdAt and updatedAt auto-set via schema defaults
     });
 
     revalidatePath(`/profile/${profileId}/applicant`);
@@ -175,7 +174,7 @@ export async function submitInvestorProfile(formData: FormData) {
           investmentGoals: data.investmentGoals as string,
           investmentHistory: data.investmentHistory as string,
           riskTolerance: data.riskTolerance as string,
-          updatedAt: new Date(),
+          // updatedAt auto-updates via .$onUpdate() in schema
         })
         .where(eq(investorProfiles.id, existingProfile.id));
     } else {
@@ -189,8 +188,7 @@ export async function submitInvestorProfile(formData: FormData) {
         investmentGoals: data.investmentGoals as string,
         investmentHistory: data.investmentHistory as string,
         riskTolerance: data.riskTolerance as string,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        // createdAt and updatedAt auto-set via schema defaults
       });
     }
 
