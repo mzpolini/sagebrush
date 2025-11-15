@@ -2,20 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@layer base {
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display;
+  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 100%;
+
+    --ring: 226 94% 67%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer components {
+  .input {
+    @apply block w-full rounded-md bg-background-secondary px-3 py-1.5 text-foreground
+           outline outline-1 -outline-offset-1 outline-border
+           placeholder:text-foreground-muted
+           focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-primary-foreground 
+           shadow-sm hover:bg-primary-hover 
+           focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 
+           focus-visible:outline-primary;
+  }
+
+  .btn-secondary {
+    @apply rounded-md bg-secondary px-3.5 py-2 text-sm font-semibold text-secondary-foreground
+           shadow-sm hover:bg-secondary-hover;
+  }
 }
