@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Outfit, Source_Sans_3, Geist_Mono } from "next/font/google";
 import Header from "./_components/Header";
+import { ThemeProvider } from "@/components/theme-provider";
+import { getServerTheme } from "@/lib/get-server-theme";
 import "./globals.css";
 
 const sourceSans = Source_Sans_3({
@@ -29,6 +31,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const theme = getServerTheme();
+
   return (
     <ClerkProvider
       appearance={{
@@ -42,8 +46,10 @@ export default function RootLayout({
         className={`${sourceSans.variable} ${outfit.variable} ${geistMono.variable} antialiased`}
       >
         <body>
-          <Header />
-          {children}
+          <ThemeProvider defaultTheme={theme}>
+            <Header />
+            {children}
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
