@@ -4,6 +4,7 @@ import { Outfit, Source_Sans_3, Geist_Mono } from "next/font/google";
 import Header from "./_components/Header";
 import "./globals.css";
 import Footer from "./_components/Footer";
+import { ToastProvider } from "@/components/ui/toast";
 
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans",
@@ -51,9 +52,11 @@ export default function RootLayout({
         className={`${sourceSans.variable} ${outfit.variable} ${geistMono.variable} antialiased`}
       >
         <body>
-          <Header />
-          {children}
-          <Footer />
+          <ToastProvider>
+            <Header />
+            {children}
+            <Footer />
+          </ToastProvider>
         </body>
       </html>
     </ClerkProvider>

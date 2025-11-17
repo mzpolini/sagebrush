@@ -4,7 +4,10 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useRef, useTransition } from "react";
 import { schema, type FormData } from "./schema";
 import { onSubmitAction } from "./submit";
-import { ChevronDownIcon } from "@heroicons/react/16/solid";
+import { Textarea } from "@/components/forms/Textarea";
+import { Select } from "@/components/forms/Select";
+import { FormActions } from "@/components/forms/FormActions";
+import { useToast } from "@/components/ui/toast";
 
 interface Props {
   initialData?: {
@@ -25,6 +28,7 @@ interface Props {
 export default function InvestorForm({ initialData }: Props = {}) {
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
+  const { addToast } = useToast();
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -43,8 +47,6 @@ export default function InvestorForm({ initialData }: Props = {}) {
   async function onSubmit(data: FormData) {
     startTransition(async () => {
       const formData = new FormData();
-
-      // Add the current URL to the form data to extract the profile ID
       formData.append("url", window.location.href);
 
       Object.entries(data).forEach(([key, value]) => {
@@ -59,13 +61,30 @@ export default function InvestorForm({ initialData }: Props = {}) {
         }
       });
 
-      await onSubmitAction(formData);
+      try {
+        await onSubmitAction(formData);
+        addToast({
+          title: "Success",
+          description: "Investor profile submitted successfully",
+          type: "success",
+          duration: 5000,
+        });
+      } catch (error) {
+        addToast({
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to submit investor profile",
+          type: "error",
+          duration: 5000,
+        });
+      }
     });
   }
 
+  const isDirty = form.formState.isDirty;
+
   return (
     <FormProvider {...form}>
-      <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)}>
+      <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} aria-label="Investor profile form">
         <div className="space-y-12">
           <div className="border-b border-border pb-12">
             <h2 className="font-display text-lg font-semibold text-foreground">
@@ -77,96 +96,51 @@ export default function InvestorForm({ initialData }: Props = {}) {
 
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
               <div className="sm:col-span-3">
-                <label
-                  htmlFor="investmentRange"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
+                <Select
+                  {...form.register("investmentRange")}
+                  label="Investment Range"
+                  error={form.formState.errors.investmentRange?.message}
+                  required
                 >
-                  Investment Range
-                </label>
-                <div className="mt-2 grid grid-cols-1">
-                  <select
-                    {...form.register("investmentRange")}
-                    className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-background-secondary py-1.5 pl-3 pr-8 text-base text-foreground outline outline-1 -outline-offset-1 outline-border focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                  >
-                    <option value="">Select investment range</option>
-                    <option value="under_50k">Under $50,000</option>
-                    <option value="50k_100k">$50,000 - $100,000</option>
-                    <option value="100k_250k">$100,000 - $250,000</option>
-                    <option value="250k_500k">$250,000 - $500,000</option>
-                    <option value="500k_1m">$500,000 - $1 million</option>
-                    <option value="over_1m">Over $1 million</option>
-                  </select>
-                  <ChevronDownIcon
-                    aria-hidden="true"
-                    className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-foreground-muted sm:size-4"
-                  />
-                  {form.formState.errors.investmentRange?.message && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {form.formState.errors.investmentRange.message}
-                    </p>
-                  )}
-                </div>
+                  <option value="">Select investment range</option>
+                  <option value="under_50k">Under $50,000</option>
+                  <option value="50k_100k">$50,000 - $100,000</option>
+                  <option value="100k_250k">$100,000 - $250,000</option>
+                  <option value="250k_500k">$250,000 - $500,000</option>
+                  <option value="500k_1m">$500,000 - $1 million</option>
+                  <option value="over_1m">Over $1 million</option>
+                </Select>
               </div>
 
               <div className="sm:col-span-3">
-                <label
-                  htmlFor="investmentStyle"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
+                <Select
+                  {...form.register("investmentStyle")}
+                  label="Investment Style"
+                  error={form.formState.errors.investmentStyle?.message}
+                  required
                 >
-                  Investment Style
-                </label>
-                <div className="mt-2 grid grid-cols-1">
-                  <select
-                    {...form.register("investmentStyle")}
-                    className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-background-secondary py-1.5 pl-3 pr-8 text-base text-foreground outline outline-1 -outline-offset-1 outline-border focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                  >
-                    <option value="">Select investment style</option>
-                    <option value="passive">Passive</option>
-                    <option value="active">Active</option>
-                    <option value="strategic">Strategic</option>
-                    <option value="angel">Angel Investor</option>
-                    <option value="venture">Venture Capital</option>
-                  </select>
-                  <ChevronDownIcon
-                    aria-hidden="true"
-                    className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-foreground-muted sm:size-4"
-                  />
-                  {form.formState.errors.investmentStyle?.message && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {form.formState.errors.investmentStyle.message}
-                    </p>
-                  )}
-                </div>
+                  <option value="">Select investment style</option>
+                  <option value="passive">Passive</option>
+                  <option value="active">Active</option>
+                  <option value="strategic">Strategic</option>
+                  <option value="angel">Angel Investor</option>
+                  <option value="venture">Venture Capital</option>
+                </Select>
               </div>
 
               <div className="sm:col-span-3">
-                <label
-                  htmlFor="riskTolerance"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
+                <Select
+                  {...form.register("riskTolerance")}
+                  label="Risk Tolerance"
+                  error={form.formState.errors.riskTolerance?.message}
+                  required
                 >
-                  Risk Tolerance
-                </label>
-                <div className="mt-2 grid grid-cols-1">
-                  <select
-                    {...form.register("riskTolerance")}
-                    className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-background-secondary py-1.5 pl-3 pr-8 text-base text-foreground outline outline-1 -outline-offset-1 outline-border focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                  >
-                    <option value="">Select risk tolerance</option>
-                    <option value="conservative">Conservative</option>
-                    <option value="moderate">Moderate</option>
-                    <option value="aggressive">Aggressive</option>
-                    <option value="speculative">Speculative</option>
-                  </select>
-                  <ChevronDownIcon
-                    aria-hidden="true"
-                    className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-foreground-muted sm:size-4"
-                  />
-                  {form.formState.errors.riskTolerance?.message && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {form.formState.errors.riskTolerance.message}
-                    </p>
-                  )}
-                </div>
+                  <option value="">Select risk tolerance</option>
+                  <option value="conservative">Conservative</option>
+                  <option value="moderate">Moderate</option>
+                  <option value="aggressive">Aggressive</option>
+                  <option value="speculative">Speculative</option>
+                </Select>
               </div>
 
               <div className="sm:col-span-3">
@@ -176,6 +150,7 @@ export default function InvestorForm({ initialData }: Props = {}) {
                     {...form.register("accreditedStatus")}
                     type="checkbox"
                     className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                    aria-describedby="accredited-description"
                   />
                   <label
                     htmlFor="accreditedStatus"
@@ -185,7 +160,7 @@ export default function InvestorForm({ initialData }: Props = {}) {
                   </label>
                 </div>
                 {form.formState.errors.accreditedStatus?.message && (
-                  <p className="mt-1 text-sm text-red-500">
+                  <p className="mt-1 text-sm text-error" role="alert">
                     {form.formState.errors.accreditedStatus.message}
                   </p>
                 )}
@@ -203,55 +178,31 @@ export default function InvestorForm({ initialData }: Props = {}) {
 
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
               <div className="col-span-full">
-                <label
-                  htmlFor="investmentGoals"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
-                >
-                  Investment Goals
-                </label>
-                <div className="mt-2">
-                  <textarea
-                    {...form.register("investmentGoals")}
-                    rows={4}
-                    className="block w-full rounded-md bg-background-secondary px-3 py-1.5 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-foreground-muted focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                    placeholder="Describe your investment goals in the cannabis industry"
-                  />
-                  {form.formState.errors.investmentGoals?.message && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {form.formState.errors.investmentGoals.message}
-                    </p>
-                  )}
-                </div>
-                <p className="mt-3 text-sm/6 text-foreground-muted">
-                  Include details about your short and long-term investment
-                  objectives.
-                </p>
+                <Textarea
+                  {...form.register("investmentGoals")}
+                  label="Investment Goals"
+                  error={form.formState.errors.investmentGoals?.message}
+                  rows={4}
+                  maxLength={2000}
+                  showCount
+                  helperText="Include details about your short and long-term investment objectives."
+                  placeholder="Describe your investment goals in the cannabis industry"
+                  required
+                />
               </div>
 
               <div className="col-span-full">
-                <label
-                  htmlFor="investmentHistory"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
-                >
-                  Investment History
-                </label>
-                <div className="mt-2">
-                  <textarea
-                    {...form.register("investmentHistory")}
-                    rows={4}
-                    className="block w-full rounded-md bg-background-secondary px-3 py-1.5 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-foreground-muted focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                    placeholder="Describe your past investment experience"
-                  />
-                  {form.formState.errors.investmentHistory?.message && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {form.formState.errors.investmentHistory.message}
-                    </p>
-                  )}
-                </div>
-                <p className="mt-3 text-sm/6 text-foreground-muted">
-                  Share information about your previous investments, especially
-                  in cannabis or related industries.
-                </p>
+                <Textarea
+                  {...form.register("investmentHistory")}
+                  label="Investment History"
+                  error={form.formState.errors.investmentHistory?.message}
+                  rows={4}
+                  maxLength={2000}
+                  showCount
+                  helperText="Share information about your previous investments, especially in cannabis or related industries."
+                  placeholder="Describe your past investment experience"
+                  required
+                />
               </div>
             </div>
           </div>
@@ -267,7 +218,7 @@ export default function InvestorForm({ initialData }: Props = {}) {
             <div className="mt-10 space-y-10">
               <fieldset>
                 <legend className="text-sm/6 font-semibold text-foreground-secondary">
-                  Regions
+                  Regions <span className="text-error" aria-label="required">*</span>
                 </legend>
                 <div className="mt-6 space-y-6">
                   <div className="flex gap-3">
@@ -440,7 +391,7 @@ export default function InvestorForm({ initialData }: Props = {}) {
                 </div>
               </fieldset>
               {form.formState.errors.preferredLocations?.message && (
-                <p className="mt-1 text-sm text-red-500">
+                <p className="mt-1 text-sm text-error" role="alert">
                   {form.formState.errors.preferredLocations.message}
                 </p>
               )}
@@ -448,14 +399,13 @@ export default function InvestorForm({ initialData }: Props = {}) {
           </div>
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-x-6">
-          <button type="button" className="btn-secondary">
-            Cancel
-          </button>
-          <button type="submit" disabled={isPending} className="btn-primary">
-            {isPending ? "Submitting..." : "Submit Profile"}
-          </button>
-        </div>
+        <FormActions
+          submitText="Submit Profile"
+          cancelText="Cancel"
+          isSubmitting={isPending}
+          isSticky={true}
+          isDirty={isDirty}
+        />
       </form>
     </FormProvider>
   );

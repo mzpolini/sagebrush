@@ -124,9 +124,22 @@ export async function submitApplicantProfile(formData: FormData) {
     throw new Error("You must be logged in to submit an application");
   }
 
-  const data = Object.fromEntries(formData.entries());
+  // Import schema dynamically to avoid circular dependencies
+  const { schema } = await import("../(app)/profile/applicant/schema");
 
   try {
+    const data = Object.fromEntries(formData.entries());
+
+    // Server-side validation
+    const validatedData = schema.parse({
+      licenseType: data.licenseType,
+      experience: data.experience,
+      criminalHistory: data.criminalHistory || "",
+      financialInvestment: data.financialInvestment,
+      securityPlan: data.securityPlan,
+      businessPlan: data.businessPlan,
+    });
+
     // First get the user's UUID from their clerkId
     const user = await db
       .select()
@@ -150,12 +163,12 @@ export async function submitApplicantProfile(formData: FormData) {
       await db
         .update(applicantProfiles)
         .set({
-          licenseType: data.licenseType as string,
-          experience: data.experience as string,
-          criminalHistory: (data.criminalHistory as string) || null,
-          financialInvestment: data.financialInvestment as string,
-          securityPlan: data.securityPlan as string,
-          businessPlan: data.businessPlan as string,
+          licenseType: validatedData.licenseType,
+          experience: validatedData.experience,
+          criminalHistory: validatedData.criminalHistory || null,
+          financialInvestment: validatedData.financialInvestment,
+          securityPlan: validatedData.securityPlan,
+          businessPlan: validatedData.businessPlan,
           status: "pending",
           submittedAt: new Date(),
           updatedAt: new Date(),
@@ -165,12 +178,12 @@ export async function submitApplicantProfile(formData: FormData) {
       // Create new profile
       await db.insert(applicantProfiles).values({
         userId: user[0].id,
-        licenseType: data.licenseType as string,
-        experience: data.experience as string,
-        criminalHistory: (data.criminalHistory as string) || null,
-        financialInvestment: data.financialInvestment as string,
-        securityPlan: data.securityPlan as string,
-        businessPlan: data.businessPlan as string,
+        licenseType: validatedData.licenseType,
+        experience: validatedData.experience,
+        criminalHistory: validatedData.criminalHistory || null,
+        financialInvestment: validatedData.financialInvestment,
+        securityPlan: validatedData.securityPlan,
+        businessPlan: validatedData.businessPlan,
         status: "pending",
         submittedAt: new Date(),
       });
@@ -180,6 +193,9 @@ export async function submitApplicantProfile(formData: FormData) {
     redirect("/profile");
   } catch (error) {
     console.error("Error submitting application:", error);
+    if (error instanceof Error) {
+      throw error;
+    }
     throw new Error("Failed to submit application. Please try again.");
   }
 }
@@ -222,14 +238,28 @@ export async function submitInvestorProfile(formData: FormData) {
     throw new Error("You must be logged in to submit an investor profile");
   }
 
-  const data = Object.fromEntries(formData.entries());
-
-  // Convert preferredLocations from FormData to array
-  const preferredLocationsEntries = Array.from(formData.entries())
-    .filter(([key]) => key === "preferredLocations")
-    .map(([, value]) => value as string);
+  // Import schema dynamically to avoid circular dependencies
+  const { schema } = await import("../(app)/profile/investor/schema");
 
   try {
+    const data = Object.fromEntries(formData.entries());
+
+    // Convert preferredLocations from FormData to array
+    const preferredLocationsEntries = Array.from(formData.entries())
+      .filter(([key]) => key === "preferredLocations")
+      .map(([, value]) => value as string);
+
+    // Server-side validation
+    const validatedData = schema.parse({
+      investmentRange: data.investmentRange,
+      investmentStyle: data.investmentStyle,
+      preferredLocations: preferredLocationsEntries,
+      accreditedStatus: data.accreditedStatus === "true",
+      investmentGoals: data.investmentGoals,
+      investmentHistory: data.investmentHistory,
+      riskTolerance: data.riskTolerance,
+    });
+
     // First get the user's UUID from their clerkId
     const user = await db
       .select()
@@ -253,27 +283,27 @@ export async function submitInvestorProfile(formData: FormData) {
       await db
         .update(investorProfiles)
         .set({
-          investmentRange: data.investmentRange as string,
-          investmentStyle: data.investmentStyle as string,
-          preferredLocations: preferredLocationsEntries,
-          accreditedStatus: data.accreditedStatus === "true",
-          investmentGoals: data.investmentGoals as string,
-          investmentHistory: data.investmentHistory as string,
-          riskTolerance: data.riskTolerance as string,
+          investmentRange: validatedData.investmentRange,
+          investmentStyle: validatedData.investmentStyle,
+          preferredLocations: validatedData.preferredLocations,
+          accreditedStatus: validatedData.accreditedStatus,
+          investmentGoals: validatedData.investmentGoals,
+          investmentHistory: validatedData.investmentHistory,
+          riskTolerance: validatedData.riskTolerance,
           updatedAt: new Date(),
         })
         .where(eq(investorProfiles.id, existingProfile[0].id));
     } else {
       // Create new profile
       await db.insert(investorProfiles).values({
-        userId: user[0].id, // Use the UUID from users table
-        investmentRange: data.investmentRange as string,
-        investmentStyle: data.investmentStyle as string,
-        preferredLocations: preferredLocationsEntries,
-        accreditedStatus: data.accreditedStatus === "true",
-        investmentGoals: data.investmentGoals as string,
-        investmentHistory: data.investmentHistory as string,
-        riskTolerance: data.riskTolerance as string,
+        userId: user[0].id,
+        investmentRange: validatedData.investmentRange,
+        investmentStyle: validatedData.investmentStyle,
+        preferredLocations: validatedData.preferredLocations,
+        accreditedStatus: validatedData.accreditedStatus,
+        investmentGoals: validatedData.investmentGoals,
+        investmentHistory: validatedData.investmentHistory,
+        riskTolerance: validatedData.riskTolerance,
       });
     }
 
@@ -281,6 +311,9 @@ export async function submitInvestorProfile(formData: FormData) {
     redirect("/profile");
   } catch (error) {
     console.error("Error submitting investor profile:", error);
+    if (error instanceof Error) {
+      throw error;
+    }
     throw new Error("Failed to submit investor profile. Please try again.");
   }
 }

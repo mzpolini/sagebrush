@@ -5,17 +5,35 @@ import { schema } from "./schema";
 import { z } from "zod";
 
 export async function onSubmitAction(
-  prevState: { message: string },
+  prevState: { message: string; success?: boolean },
   data: z.output<typeof schema>
-): Promise<{ message: string }> {
+): Promise<{ message: string; success?: boolean }> {
   try {
+    // Server-side validation
+    const validatedData = schema.parse(data);
+
     const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
+    Object.entries(validatedData).forEach(([key, value]) => {
       if (value) formData.append(key, value);
     });
+
     await updateUserProfile(formData);
-    return { message: "Profile updated successfully" };
+
+    return {
+      message: "Profile updated successfully",
+      success: true
+    };
   } catch (error) {
-    return { message: (error as Error).message };
+    if (error instanceof z.ZodError) {
+      const firstError = error.errors[0];
+      return {
+        message: firstError.message,
+        success: false
+      };
+    }
+    return {
+      message: (error as Error).message || "Failed to update profile",
+      success: false
+    };
   }
 }

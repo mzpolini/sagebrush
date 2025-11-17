@@ -1,15 +1,18 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRef, useActionState, useTransition } from "react";
+import { useRef, useActionState, useTransition, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { Input } from "@/components/forms/Input";
+import { Textarea } from "@/components/forms/Textarea";
+import { Select } from "@/components/forms/Select";
+import { FormActions } from "@/components/forms/FormActions";
+import { useToast } from "@/components/ui/toast";
 import { z } from "zod";
 import { schema, type FormData } from "./schema";
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
-import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { onSubmitAction } from "./submit";
 
-type ActionState = { message: string };
+type ActionState = { message: string; success?: boolean };
 
 interface Props {
   initialData?: {
@@ -28,13 +31,14 @@ interface Props {
   };
 }
 
-export default function ApplicantForm({ initialData }: Props) {
+export default function GeneralProfileForm({ initialData }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
-  const [, startTransition] = useTransition();
-  const [, formAction] = useActionState<ActionState, z.output<typeof schema>>(
+  const [isPending, startTransition] = useTransition();
+  const [state, formAction] = useActionState<ActionState, z.output<typeof schema>>(
     onSubmitAction,
     { message: "" }
   );
+  const { addToast } = useToast();
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -48,26 +52,34 @@ export default function ApplicantForm({ initialData }: Props) {
       city: initialData?.city ?? "",
       state: initialData?.state ?? "",
       zip: initialData?.zip ?? "",
-      country: initialData?.country ?? "",
+      country: initialData?.country ?? "United States",
     },
     mode: "onBlur",
   });
 
+  // Show toast on form submission result
+  useEffect(() => {
+    if (state.message) {
+      addToast({
+        title: state.success ? "Success" : "Error",
+        description: state.message,
+        type: state.success ? "success" : "error",
+        duration: 5000,
+      });
+    }
+  }, [state, addToast]);
+
   const onSubmit = form.handleSubmit((data) => {
     startTransition(async () => {
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (value) formData.append(key, value);
-      });
       formAction(data);
     });
   });
 
-  console.log("errors", form.formState.errors);
-  console.log("form", form.watch());
+  const isDirty = form.formState.isDirty;
+
   return (
     <FormProvider {...form}>
-      <form ref={formRef} onSubmit={onSubmit}>
+      <form ref={formRef} onSubmit={onSubmit} aria-label="General profile form">
         <div className="space-y-12">
           <div className="border-b border-border pb-12">
             <h2 className="font-display text-lg font-semibold text-foreground">
@@ -101,21 +113,17 @@ export default function ApplicantForm({ initialData }: Props) {
               </div>
 
               <div className="col-span-full">
-                <label
-                  htmlFor="about"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
-                >
-                  About
-                </label>
-                <div className="mt-2">
-                  <textarea
-                    {...form.register("about")}
-                    className="block w-full rounded-md bg-background-secondary px-3 py-1.5 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-foreground-muted focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                  />
-                </div>
-                <p className="mt-3 text-sm/6 text-foreground-muted">
-                  Write a few sentences about yourself.
-                </p>
+                <Textarea
+                  {...form.register("about")}
+                  label="About"
+                  error={form.formState.errors.about?.message}
+                  rows={4}
+                  maxLength={1000}
+                  showCount
+                  helperText="Write a few sentences about yourself."
+                  required
+                  placeholder="Tell us about yourself..."
+                />
               </div>
 
               <div className="col-span-full">
@@ -183,149 +191,100 @@ export default function ApplicantForm({ initialData }: Props) {
 
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
               <div className="sm:col-span-3">
-                <label
-                  htmlFor="first-name"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
-                >
-                  First name
-                </label>
-                <div className="mt-2">
-                  <Input
-                    {...form.register("firstName")}
-                    error={form.formState.errors.firstName?.message}
-                  />
-                </div>
+                <Input
+                  {...form.register("firstName")}
+                  label="First name"
+                  error={form.formState.errors.firstName?.message}
+                  type="text"
+                  autoComplete="given-name"
+                  required
+                  placeholder="John"
+                />
               </div>
 
               <div className="sm:col-span-3">
-                <label
-                  htmlFor="last-name"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
-                >
-                  Last name
-                </label>
-                <div className="mt-2">
-                  <Input
-                    {...form.register("lastName")}
-                    error={form.formState.errors.lastName?.message}
-                  />
-                </div>
+                <Input
+                  {...form.register("lastName")}
+                  label="Last name"
+                  error={form.formState.errors.lastName?.message}
+                  type="text"
+                  autoComplete="family-name"
+                  required
+                  placeholder="Doe"
+                />
               </div>
 
               <div className="sm:col-span-4">
-                <label
-                  htmlFor="email"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
-                >
-                  Email address
-                </label>
-                <div className="mt-2">
-                  <Input
-                    {...form.register("email")}
-                    error={form.formState.errors.email?.message}
-                    type="email"
-                    autoComplete="email"
-                  />
-                </div>
+                <Input
+                  {...form.register("email")}
+                  label="Email address"
+                  error={form.formState.errors.email?.message}
+                  type="email"
+                  autoComplete="email"
+                  required
+                  placeholder="john.doe@example.com"
+                />
               </div>
 
               <div className="sm:col-span-3">
-                <label
-                  htmlFor="country"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
+                <Select
+                  {...form.register("country")}
+                  label="Country"
+                  error={form.formState.errors.country?.message}
+                  required
                 >
-                  Country
-                </label>
-                <div className="mt-2 grid grid-cols-1">
-                  <select
-                    {...form.register("country")}
-                    className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-background-secondary py-1.5 pl-3 pr-8 text-base text-foreground outline outline-1 -outline-offset-1 outline-border focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                  >
-                    <option>United States</option>
-                    <option>Canada</option>
-                    <option>Mexico</option>
-                  </select>
-                  <ChevronDownIcon
-                    aria-hidden="true"
-                    className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-foreground-muted sm:size-4"
-                  />
-                </div>
+                  <option value="United States">United States</option>
+                  <option value="Canada">Canada</option>
+                  <option value="Mexico">Mexico</option>
+                </Select>
               </div>
 
               <div className="col-span-full">
-                <label
-                  htmlFor="address"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
-                >
-                  Street address
-                </label>
-                <div className="mt-2">
-                  <Input
-                    {...form.register("address")}
-                    id="address"
-                    name="address"
-                    type="text"
-                    autoComplete="street-address"
-                    className="block w-full rounded-md bg-background-secondary px-3 py-1.5 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-foreground-muted focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                  />
-                </div>
+                <Input
+                  {...form.register("address")}
+                  label="Street address"
+                  error={form.formState.errors.address?.message}
+                  type="text"
+                  autoComplete="street-address"
+                  required
+                  placeholder="123 Main St"
+                />
               </div>
 
               <div className="sm:col-span-2 sm:col-start-1">
-                <label
-                  htmlFor="city"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
-                >
-                  City
-                </label>
-                <div className="mt-2">
-                  <Input
-                    {...form.register("city")}
-                    id="city"
-                    name="city"
-                    type="text"
-                    autoComplete="address-level2"
-                    className="block w-full rounded-md bg-background-secondary px-3 py-1.5 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-foreground-muted focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                  />
-                </div>
+                <Input
+                  {...form.register("city")}
+                  label="City"
+                  error={form.formState.errors.city?.message}
+                  type="text"
+                  autoComplete="address-level2"
+                  required
+                  placeholder="San Francisco"
+                />
               </div>
 
               <div className="sm:col-span-2">
-                <label
-                  htmlFor="state"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
-                >
-                  State / Province
-                </label>
-                <div className="mt-2">
-                  <Input
-                    {...form.register("state")}
-                    id="state"
-                    name="state"
-                    type="text"
-                    autoComplete="address-level1"
-                    className="block w-full rounded-md bg-background-secondary px-3 py-1.5 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-foreground-muted focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                  />
-                </div>
+                <Input
+                  {...form.register("state")}
+                  label="State / Province"
+                  error={form.formState.errors.state?.message}
+                  type="text"
+                  autoComplete="address-level1"
+                  required
+                  placeholder="CA"
+                />
               </div>
 
               <div className="sm:col-span-2">
-                <label
-                  htmlFor="zip"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
-                >
-                  ZIP / Postal code
-                </label>
-                <div className="mt-2">
-                  <Input
-                    {...form.register("zip")}
-                    id="zip"
-                    name="zip"
-                    type="text"
-                    autoComplete="zip"
-                    className="block w-full rounded-md bg-background-secondary px-3 py-1.5 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-foreground-muted focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                  />
-                </div>
+                <Input
+                  {...form.register("zip")}
+                  label="ZIP / Postal code"
+                  error={form.formState.errors.zip?.message}
+                  type="text"
+                  autoComplete="postal-code"
+                  required
+                  placeholder="94102"
+                />
               </div>
             </div>
           </div>
@@ -548,14 +507,13 @@ export default function ApplicantForm({ initialData }: Props) {
           </div>
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-x-6">
-          <button type="button" className="btn-secondary">
-            Cancel
-          </button>
-          <button type="submit" className="btn-primary">
-            Save
-          </button>
-        </div>
+        <FormActions
+          submitText="Save"
+          cancelText="Cancel"
+          isSubmitting={isPending}
+          isSticky={true}
+          isDirty={isDirty}
+        />
       </form>
     </FormProvider>
   );
