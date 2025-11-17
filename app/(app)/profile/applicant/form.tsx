@@ -4,7 +4,10 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useRef, useTransition } from "react";
 import { schema, type FormData } from "./schema";
 import { onSubmitAction } from "./submit";
-import { ChevronDownIcon } from "@heroicons/react/16/solid";
+import { Textarea } from "@/components/forms/Textarea";
+import { Select } from "@/components/forms/Select";
+import { FormActions } from "@/components/forms/FormActions";
+import { useToast } from "@/components/ui/toast";
 
 interface Props {
   initialData?: {
@@ -26,12 +29,13 @@ interface Props {
 export default function ApplicantForm({ initialData }: Props = {}) {
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
+  const { addToast } = useToast();
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     mode: "onBlur",
     defaultValues: {
-      licenseType: initialData?.licenseType || "",
+      licenseType: (initialData?.licenseType as FormData["licenseType"]) || undefined,
       experience: initialData?.experience || "",
       criminalHistory: initialData?.criminalHistory || "",
       financialInvestment: initialData?.financialInvestment || "",
@@ -43,8 +47,6 @@ export default function ApplicantForm({ initialData }: Props = {}) {
   async function onSubmit(data: FormData) {
     startTransition(async () => {
       const formData = new FormData();
-
-      // Add the current URL to the form data to extract the profile ID
       formData.append("url", window.location.href);
 
       Object.entries(data).forEach(([key, value]) => {
@@ -57,13 +59,30 @@ export default function ApplicantForm({ initialData }: Props = {}) {
         }
       });
 
-      await onSubmitAction(formData);
+      try {
+        await onSubmitAction(formData);
+        addToast({
+          title: "Success",
+          description: "Application submitted successfully",
+          type: "success",
+          duration: 5000,
+        });
+      } catch (error) {
+        addToast({
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to submit application",
+          type: "error",
+          duration: 5000,
+        });
+      }
     });
   }
 
+  const isDirty = form.formState.isDirty;
+
   return (
     <FormProvider {...form}>
-      <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)}>
+      <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} aria-label="Cannabis license application form">
         <div className="space-y-12">
           <div className="border-b border-border pb-12">
             <h2 className="font-display text-lg font-semibold text-foreground">
@@ -75,34 +94,19 @@ export default function ApplicantForm({ initialData }: Props = {}) {
 
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
               <div className="sm:col-span-3">
-                <label
-                  htmlFor="licenseType"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
+                <Select
+                  {...form.register("licenseType")}
+                  label="License Type"
+                  error={form.formState.errors.licenseType?.message}
+                  required
                 >
-                  License Type
-                </label>
-                <div className="mt-2 grid grid-cols-1">
-                  <select
-                    {...form.register("licenseType")}
-                    className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-background-secondary py-1.5 pl-3 pr-8 text-base text-foreground outline outline-1 -outline-offset-1 outline-border focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                  >
-                    <option value="">Select license type</option>
-                    <option value="cultivation">Cultivation</option>
-                    <option value="processing">Processing</option>
-                    <option value="retail">Retail</option>
-                    <option value="distribution">Distribution</option>
-                    <option value="testing">Testing</option>
-                  </select>
-                  <ChevronDownIcon
-                    aria-hidden="true"
-                    className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-foreground-muted sm:size-4"
-                  />
-                  {form.formState.errors.licenseType?.message && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {form.formState.errors.licenseType.message}
-                    </p>
-                  )}
-                </div>
+                  <option value="">Select license type</option>
+                  <option value="cultivation">Cultivation</option>
+                  <option value="processing">Processing</option>
+                  <option value="retail">Retail</option>
+                  <option value="distribution">Distribution</option>
+                  <option value="testing">Testing</option>
+                </Select>
               </div>
             </div>
           </div>
@@ -117,55 +121,30 @@ export default function ApplicantForm({ initialData }: Props = {}) {
 
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
               <div className="col-span-full">
-                <label
-                  htmlFor="experience"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
-                >
-                  Industry Experience
-                </label>
-                <div className="mt-2">
-                  <textarea
-                    {...form.register("experience")}
-                    rows={4}
-                    className="block w-full rounded-md bg-background-secondary px-3 py-1.5 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-foreground-muted focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                    placeholder="Describe your experience in the cannabis industry"
-                  />
-                  {form.formState.errors.experience?.message && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {form.formState.errors.experience.message}
-                    </p>
-                  )}
-                </div>
-                <p className="mt-3 text-sm/6 text-foreground-muted">
-                  Include details about your past work in the cannabis industry
-                  or related fields.
-                </p>
+                <Textarea
+                  {...form.register("experience")}
+                  label="Industry Experience"
+                  error={form.formState.errors.experience?.message}
+                  rows={4}
+                  maxLength={2000}
+                  showCount
+                  helperText="Include details about your past work in the cannabis industry or related fields."
+                  placeholder="Describe your experience in the cannabis industry"
+                  required
+                />
               </div>
 
               <div className="col-span-full">
-                <label
-                  htmlFor="criminalHistory"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
-                >
-                  Criminal History (if applicable)
-                </label>
-                <div className="mt-2">
-                  <textarea
-                    {...form.register("criminalHistory")}
-                    rows={4}
-                    className="block w-full rounded-md bg-background-secondary px-3 py-1.5 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-foreground-muted focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                    placeholder="Disclose any relevant criminal history (optional)"
-                  />
-                  {form.formState.errors.criminalHistory?.message && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {form.formState.errors.criminalHistory.message}
-                    </p>
-                  )}
-                </div>
-                <p className="mt-3 text-sm/6 text-foreground-muted">
-                  This information will be kept confidential and is used for
-                  background check purposes.
-                </p>
+                <Textarea
+                  {...form.register("criminalHistory")}
+                  label="Criminal History (if applicable)"
+                  error={form.formState.errors.criminalHistory?.message}
+                  rows={4}
+                  maxLength={2000}
+                  showCount
+                  helperText="This information will be kept confidential and is used for background check purposes."
+                  placeholder="Disclose any relevant criminal history (optional)"
+                />
               </div>
             </div>
           </div>
@@ -180,94 +159,57 @@ export default function ApplicantForm({ initialData }: Props = {}) {
 
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
               <div className="col-span-full">
-                <label
-                  htmlFor="financialInvestment"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
-                >
-                  Financial Investment
-                </label>
-                <div className="mt-2">
-                  <textarea
-                    {...form.register("financialInvestment")}
-                    rows={4}
-                    className="block w-full rounded-md bg-background-secondary px-3 py-1.5 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-foreground-muted focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                    placeholder="Describe your financial investment plans"
-                  />
-                  {form.formState.errors.financialInvestment?.message && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {form.formState.errors.financialInvestment.message}
-                    </p>
-                  )}
-                </div>
-                <p className="mt-3 text-sm/6 text-foreground-muted">
-                  Include information about funding sources and capital
-                  allocation.
-                </p>
+                <Textarea
+                  {...form.register("financialInvestment")}
+                  label="Financial Investment"
+                  error={form.formState.errors.financialInvestment?.message}
+                  rows={4}
+                  maxLength={2000}
+                  showCount
+                  helperText="Include information about funding sources and capital allocation."
+                  placeholder="Describe your financial investment plans"
+                  required
+                />
               </div>
 
               <div className="col-span-full">
-                <label
-                  htmlFor="securityPlan"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
-                >
-                  Security Plan
-                </label>
-                <div className="mt-2">
-                  <textarea
-                    {...form.register("securityPlan")}
-                    rows={4}
-                    className="block w-full rounded-md bg-background-secondary px-3 py-1.5 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-foreground-muted focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                    placeholder="Describe your security plan for the business"
-                  />
-                  {form.formState.errors.securityPlan?.message && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {form.formState.errors.securityPlan.message}
-                    </p>
-                  )}
-                </div>
-                <p className="mt-3 text-sm/6 text-foreground-muted">
-                  Detail your approach to facility security, inventory control,
-                  and compliance.
-                </p>
+                <Textarea
+                  {...form.register("securityPlan")}
+                  label="Security Plan"
+                  error={form.formState.errors.securityPlan?.message}
+                  rows={4}
+                  maxLength={2000}
+                  showCount
+                  helperText="Detail your approach to facility security, inventory control, and compliance."
+                  placeholder="Describe your security plan for the business"
+                  required
+                />
               </div>
 
               <div className="col-span-full">
-                <label
-                  htmlFor="businessPlan"
-                  className="block text-sm/6 font-medium text-foreground-secondary"
-                >
-                  Business Plan
-                </label>
-                <div className="mt-2">
-                  <textarea
-                    {...form.register("businessPlan")}
-                    rows={4}
-                    className="block w-full rounded-md bg-background-secondary px-3 py-1.5 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-foreground-muted focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
-                    placeholder="Describe your business plan"
-                  />
-                  {form.formState.errors.businessPlan?.message && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {form.formState.errors.businessPlan.message}
-                    </p>
-                  )}
-                </div>
-                <p className="mt-3 text-sm/6 text-foreground-muted">
-                  Outline your business strategy, market analysis, and growth
-                  projections.
-                </p>
+                <Textarea
+                  {...form.register("businessPlan")}
+                  label="Business Plan"
+                  error={form.formState.errors.businessPlan?.message}
+                  rows={6}
+                  maxLength={5000}
+                  showCount
+                  helperText="Outline your business strategy, market analysis, and growth projections."
+                  placeholder="Describe your business plan"
+                  required
+                />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-x-6">
-          <button type="button" className="btn-secondary">
-            Cancel
-          </button>
-          <button type="submit" disabled={isPending} className="btn-primary">
-            {isPending ? "Submitting..." : "Submit Application"}
-          </button>
-        </div>
+        <FormActions
+          submitText="Submit Application"
+          cancelText="Cancel"
+          isSubmitting={isPending}
+          isSticky={true}
+          isDirty={isDirty}
+        />
       </form>
     </FormProvider>
   );

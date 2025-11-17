@@ -1,0 +1,15 @@
+<svg width="32" height="32" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="120" height="120" fill="#ffffff"/>
+  
+  <!-- Chart bars that look like growing plants -->
+  <rect x="15" y="70" width="15" height="35" fill="#22c55e" rx="2" opacity="0.6" />
+  <rect x="37" y="55" width="15" height="50" fill="#22c55e" rx="2" opacity="0.75" />
+  <rect x="59" y="40" width="15" height="65" fill="#22c55e" rx="2" opacity="0.9" />
+  <rect x="81" y="25" width="15" height="80" fill="#22c55e" rx="2" />
+  
+  <!-- Leaf on top of tallest bar -->
+  <circle cx="88.5" cy="20" r="7" fill="#10b981" />
+  <path d="M 88.5 20 Q 92 17 95.5 20" stroke="#10b981" stroke-width="2.5" fill="none" />
+</svg>
+

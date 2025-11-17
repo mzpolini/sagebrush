@@ -54,7 +54,8 @@ export function ProbabilityRadial({
               align="right"
               wrapperStyle={{ paddingLeft: '20px' }}
               formatter={(value, entry) => {
-                const payloadData = entry.payload as { name: string; probability: number };
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const payloadData = (entry as any).payload as { name: string; probability: number };
                 return (
                   <span className="text-sm font-mono text-slate-300 font-semibold">
                     {payloadData.name}:{' '}

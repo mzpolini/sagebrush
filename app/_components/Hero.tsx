@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Leaf, TrendingUp, MapPin, Sparkles } from "lucide-react";
+import { Leaf, MapPin, Sparkles, TrendingUp } from "lucide-react";
 
 export default function Hero() {
   return (
