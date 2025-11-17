@@ -2,6 +2,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 // Define route matchers
 const isProfileRoute = createRouteMatcher(["/profile(.*)"]);
+const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"]);
 const isPublicRoute = createRouteMatcher([
   "/",
   "/features(.*)",
@@ -18,8 +19,8 @@ export default clerkMiddleware(async (auth, req) => {
     return;
   }
 
-  // Protect profile and app routes
-  if (isProfileRoute(req)) {
+  // Protect profile and dashboard routes
+  if (isProfileRoute(req) || isDashboardRoute(req)) {
     await auth.protect();
     // Sync user with database
     await fetch(new URL("/api/auth/sync", req.url), { method: "POST" });

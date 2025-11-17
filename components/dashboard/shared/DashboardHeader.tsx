@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Leaf, User, Settings, LogOut, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -64,9 +65,11 @@ export function DashboardHeader({ userName, userEmail, role, subscriptionTier }:
             <DropdownMenuContent align="end" className="bg-slate-900 border-slate-700 w-56">
               <DropdownMenuLabel className="text-slate-300">My Account</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-slate-700" />
-              <DropdownMenuItem className="text-slate-300 cursor-pointer">
-                <User className="mr-2 h-4 w-4" />
-                Profile
+              <DropdownMenuItem className="text-slate-300 cursor-pointer" asChild>
+                <Link href="/profile">
+                  <User className="mr-2 h-4 w-4" />
+                  Profile
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem className="text-slate-300 cursor-pointer">
                 <CreditCard className="mr-2 h-4 w-4" />
