@@ -1,11 +1,12 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
 // Define route matchers
-const isProfileRoute = createRouteMatcher(["/profile(.*)"]);
-const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"]);
 const isPublicRoute = createRouteMatcher([
   "/",
   "/features(.*)",
+  "/company(.*)",
+  "/faq(.*)",
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/webhooks(.*)",
@@ -13,24 +14,19 @@ const isPublicRoute = createRouteMatcher([
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
-
-  // Allow public routes
-  if (isPublicRoute(req)) {
-    return;
-  }
-
-  // Protect profile and dashboard routes
-  if (isProfileRoute(req) || isDashboardRoute(req)) {
-    await auth.protect();
-    // Sync user with database
-    await fetch(new URL("/api/auth/sync", req.url), { method: "POST" });
-  }
-
+  
   // Redirect authenticated users from root to profile
   if (req.nextUrl.pathname === "/" && userId) {
-    const profile = new URL("/profile", req.url);
-    return Response.redirect(profile);
+    const profileUrl = new URL("/profile", req.url);
+    return NextResponse.redirect(profileUrl);
   }
+
+  // Protect non-public routes
+  if (!isPublicRoute(req)) {
+    await auth.protect();
+  }
+
+  return NextResponse.next();
 });
 
 export const config = {
