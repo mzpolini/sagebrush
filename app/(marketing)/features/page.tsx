@@ -1,9 +1,9 @@
-import Pricing from "./_components/Pricing";
+import FeatureBento from "./_components/FeatureBento";
 
 export default function Example() {
   return (
     <div className="bg-white">
-      <Pricing />
+      <FeatureBento />
     </div>
   );
 }
