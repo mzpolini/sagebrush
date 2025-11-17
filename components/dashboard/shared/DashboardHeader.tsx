@@ -21,11 +21,13 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ userName, userEmail, role, subscriptionTier }: DashboardHeaderProps) {
-  const tierBadge = {
+  const tierBadges = {
     free: { icon: '🆓', label: 'Free', color: 'text-slate-400 border-slate-400/50 bg-slate-400/10' },
     basic: { icon: '⭐', label: 'Basic', color: 'text-cyan-400 border-cyan-400/50 bg-cyan-400/10' },
     pro: { icon: '💎', label: 'Pro', color: 'text-emerald-400 border-emerald-400/50 bg-emerald-400/10' },
-  }[subscriptionTier];
+  };
+  
+  const tierBadge = tierBadges[subscriptionTier as keyof typeof tierBadges] || tierBadges.free;
 
   return (
     <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-xl sticky top-0 z-50">

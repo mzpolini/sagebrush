@@ -1,4 +1,4 @@
-import { Target, TrendingUp, Users, Zap, Award, Leaf } from 'lucide-react';
+import { Target, Users, Zap, Award, Leaf } from 'lucide-react';
 
 export default function SagebrushBento() {
   return (

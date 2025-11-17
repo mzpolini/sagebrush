@@ -36,9 +36,7 @@ export function ProbabilityRadial({
             endAngle={0}
           >
             <RadialBar
-              minAngle={15}
               background={{ fill: '#1e293b' }}
-              clockWise
               dataKey="probability"
               cornerRadius={12}
               label={{
@@ -55,12 +53,15 @@ export function ProbabilityRadial({
               verticalAlign="middle"
               align="right"
               wrapperStyle={{ paddingLeft: '20px' }}
-              formatter={(value, entry: any) => (
-                <span className="text-sm font-mono text-slate-300 font-semibold">
-                  {entry.payload.name}:{' '}
-                  <span className="text-emerald-400">{entry.payload.probability.toFixed(1)}%</span>
-                </span>
-              )}
+              formatter={(value, entry) => {
+                const payloadData = entry.payload as { name: string; probability: number };
+                return (
+                  <span className="text-sm font-mono text-slate-300 font-semibold">
+                    {payloadData.name}:{' '}
+                    <span className="text-emerald-400">{payloadData.probability.toFixed(1)}%</span>
+                  </span>
+                );
+              }}
             />
             <Tooltip
               content={({ active, payload }) => {

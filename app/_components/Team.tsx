@@ -46,7 +46,7 @@ export default function SagebrushTeam() {
             Meet the Founders
           </h2>
           <p className="mt-6 text-lg/8 text-slate-400">
-            Cannabis veterans and data experts who've been in your shoes. We combine industry experience with predictive analytics to help applicants and investors make smarter decisions.
+            Cannabis veterans and data experts who&apos;ve been in your shoes. We combine industry experience with predictive analytics to help applicants and investors make smarter decisions.
           </p>
 
           {/* Team Stats */}
@@ -80,7 +80,7 @@ export default function SagebrushTeam() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </a>
-            <p className="mt-3 text-sm text-slate-500">We're hiring across data, engineering, and operations</p>
+            <p className="mt-3 text-sm text-slate-500">We&apos;re hiring across data, engineering, and operations</p>
           </div>
         </div>
 
@@ -142,7 +142,7 @@ export default function SagebrushTeam() {
                 After navigating the chaos of cannabis licensing applications ourselves, we saw a massive information gap. Applicants were making million-dollar decisions based on gut feel. Investors were flying blind.
               </p>
               <p className="text-lg text-slate-300">
-                We built Sagebrush to bring Wall Street-level analytics to cannabis licensing. Every applicant deserves to know their real odds. Every investor deserves transparent data. That's our mission.
+                We built Sagebrush to bring Wall Street-level analytics to cannabis licensing. Every applicant deserves to know their real odds. Every investor deserves transparent data. That&apos;s our mission.
               </p>
             </div>
             <div className="mt-8 lg:mt-0 space-y-4">
@@ -161,12 +161,12 @@ export default function SagebrushTeam() {
                 <div className="h-10 w-10 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
                   <span className="text-cyan-400 text-xl">✓</span>
                 </div>
-                <div>
-                  <div className="font-semibold text-white mb-1">Industry Veterans</div>
-                  <div className="text-sm text-slate-400">
-                    We've been applicants, operators, and investors ourselves
+                  <div>
+                    <div className="font-semibold text-white mb-1">Industry Veterans</div>
+                    <div className="text-sm text-slate-400">
+                      We&apos;ve been applicants, operators, and investors ourselves
+                    </div>
                   </div>
-                </div>
               </div>
               <div className="flex items-start gap-4 bg-slate-950/50 border border-slate-800 rounded-xl p-4">
                 <div className="h-10 w-10 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">

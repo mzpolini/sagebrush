@@ -90,7 +90,7 @@ export default function SagebrushFAQ() {
           Frequently Asked Questions
         </h2>
         <p className="mt-6 max-w-3xl text-base/7 text-slate-400">
-          Have a different question and can't find the answer you're looking for? Reach out to our support team by{' '}
+          Have a different question and can&apos;t find the answer you&apos;re looking for? Reach out to our support team by{' '}
           <a 
             href="mailto:support@sagebrush.io" 
             className="font-semibold text-emerald-400 hover:text-emerald-300 transition-colors inline-flex items-center gap-1"
@@ -98,7 +98,7 @@ export default function SagebrushFAQ() {
             <Mail className="h-4 w-4" />
             sending us an email
           </a>{' '}
-          and we'll get back to you within 24 hours.
+          and we&apos;ll get back to you within 24 hours.
         </p>
 
         {/* FAQ Grid */}
@@ -129,7 +129,7 @@ export default function SagebrushFAQ() {
                   Still have questions?
                 </h3>
                 <p className="text-lg text-slate-300 mb-6">
-                  Schedule a free 30-minute consultation with our cannabis licensing experts. We'll walk you through the platform and answer your specific questions about your target states.
+                  Schedule a free 30-minute consultation with our cannabis licensing experts. We&apos;ll walk you through the platform and answer your specific questions about your target states.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <button className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-colors">

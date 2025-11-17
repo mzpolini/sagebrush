@@ -105,7 +105,7 @@ export function CountyTable({
               </tr>
             </thead>
             <tbody>
-              {sortedData.map((county, idx) => (
+              {sortedData.map((county) => (
                 <tr
                   key={county.county}
                   className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors"

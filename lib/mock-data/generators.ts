@@ -1,5 +1,5 @@
 import { ProbabilityData, ApplicantProfile, InvestorProfile } from '@/lib/types/dashboard';
-import { VIRGINIA_COUNTIES, FLORIDA_COUNTIES, LICENSE_TYPES } from './constants';
+import { VIRGINIA_COUNTIES, FLORIDA_COUNTIES } from './constants';
 
 export function generateProbabilityData(state: string): ProbabilityData[] {
   const counties = state === 'Virginia' ? VIRGINIA_COUNTIES : FLORIDA_COUNTIES;
