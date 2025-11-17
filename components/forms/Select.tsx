@@ -11,7 +11,8 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 
 const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, error, label, helperText, id, required, children, ...props }, ref) => {
-    const selectId = id || `select-${React.useId()}`;
+    const generatedId = React.useId();
+    const selectId = id || `select-${generatedId}`;
     const errorId = `${selectId}-error`;
     const helperId = `${selectId}-helper`;
 

@@ -29,7 +29,8 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     const [charCount, setCharCount] = React.useState(
       props.value?.toString().length || props.defaultValue?.toString().length || 0
     );
-    const textareaId = id || `textarea-${React.useId()}`;
+    const generatedId = React.useId();
+    const textareaId = id || `textarea-${generatedId}`;
     const errorId = `${textareaId}-error`;
     const helperId = `${textareaId}-helper`;
     const countId = `${textareaId}-count`;

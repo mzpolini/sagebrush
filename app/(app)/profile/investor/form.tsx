@@ -34,13 +34,13 @@ export default function InvestorForm({ initialData }: Props = {}) {
     resolver: zodResolver(schema),
     mode: "onBlur",
     defaultValues: {
-      investmentRange: initialData?.investmentRange || "",
-      investmentStyle: initialData?.investmentStyle || "",
-      preferredLocations: initialData?.preferredLocations || [],
-      accreditedStatus: initialData?.accreditedStatus || false,
+      investmentRange: (initialData?.investmentRange as FormData["investmentRange"]) || undefined,
+      investmentStyle: (initialData?.investmentStyle as FormData["investmentStyle"]) || undefined,
+      preferredLocations: (initialData?.preferredLocations as FormData["preferredLocations"]) || [],
+      accreditedStatus: initialData?.accreditedStatus ?? false,
       investmentGoals: initialData?.investmentGoals || "",
       investmentHistory: initialData?.investmentHistory || "",
-      riskTolerance: initialData?.riskTolerance || "",
+      riskTolerance: (initialData?.riskTolerance as FormData["riskTolerance"]) || undefined,
     },
   });
 

@@ -35,7 +35,7 @@ export default function ApplicantForm({ initialData }: Props = {}) {
     resolver: zodResolver(schema),
     mode: "onBlur",
     defaultValues: {
-      licenseType: initialData?.licenseType || "",
+      licenseType: (initialData?.licenseType as FormData["licenseType"]) || undefined,
       experience: initialData?.experience || "",
       criminalHistory: initialData?.criminalHistory || "",
       financialInvestment: initialData?.financialInvestment || "",

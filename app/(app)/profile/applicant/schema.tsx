@@ -7,7 +7,8 @@ export const schema = z.object({
     .enum(licenseTypes, {
       required_error: "Please select a license type",
       invalid_type_error: "Please select a valid license type",
-    }),
+    })
+    .optional(),
   experience: z
     .string({ required_error: "Industry experience is required" })
     .trim()

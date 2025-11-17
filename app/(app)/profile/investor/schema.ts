@@ -31,12 +31,14 @@ export const schema = z.object({
     .enum(investmentRanges, {
       required_error: "Please select an investment range",
       invalid_type_error: "Please select a valid investment range",
-    }),
+    })
+    .optional(),
   investmentStyle: z
     .enum(investmentStyles, {
       required_error: "Please select an investment style",
       invalid_type_error: "Please select a valid investment style",
-    }),
+    })
+    .optional(),
   preferredLocations: z
     .array(z.enum(locations))
     .min(1, {
@@ -68,7 +70,8 @@ export const schema = z.object({
     .enum(riskTolerances, {
       required_error: "Please select your risk tolerance",
       invalid_type_error: "Please select a valid risk tolerance",
-    }),
+    })
+    .optional(),
 });
 
 export type FormData = z.infer<typeof schema>;
