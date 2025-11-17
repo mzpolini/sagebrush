@@ -24,9 +24,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Sagebrush",
   description: "Cannabis license intelligence platform",
-  icons: {
-    icon: "/favicon.ico",
-  },
   openGraph: {
     title: "Sagebrush",
     description: "Cannabis license intelligence platform",
