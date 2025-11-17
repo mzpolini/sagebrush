@@ -17,7 +17,7 @@ export default function Header() {
   const { user, isLoaded } = useUser();
 
   return (
-    <header className="bg-background">
+    <header className="bg-black">
       <nav
         aria-label="Global"
         className="mx-auto flex max-w-7xl items-center justify-between gap-x-6 p-6 lg:px-8"
@@ -98,7 +98,7 @@ export default function Header() {
         className="lg:hidden"
       >
         <div className="fixed inset-0 z-50" />
-        <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-background p-6 sm:max-w-sm sm:ring-1 sm:ring-border">
+        <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-black p-6 sm:max-w-sm sm:ring-1 sm:ring-border">
           <div className="flex items-center gap-x-6">
             <Link href="/" className="flex items-center gap-2 -m-1.5 p-1.5">
               <span className="sr-only">Sagebrush</span>
