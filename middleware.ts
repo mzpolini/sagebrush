@@ -12,9 +12,7 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();
-
-  // Allow public routes
+  // Allow public routes without any auth checks
   if (isPublicRoute(req)) {
     return;
   }
@@ -27,12 +25,20 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   // Redirect authenticated users from root to profile
-  if (req.nextUrl.pathname === "/" && userId) {
-    const profile = new URL("/profile", req.url);
-    return Response.redirect(profile);
+  if (req.nextUrl.pathname === "/") {
+    const { userId } = await auth();
+    if (userId) {
+      const profile = new URL("/profile", req.url);
+      return Response.redirect(profile);
+    }
   }
 });
 
 export const config = {
-  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+  matcher: [
+    // Skip Next.js internals and all static files
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 };
