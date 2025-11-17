@@ -172,7 +172,7 @@ export default function Hero() {
         {/* Image Section - Kept as requested */}
         <div className="bg-slate-900 lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
           <Image
-            src="/sgHeroNoWordsMobile.png"
+            src="/sgHeroNoWordsMobile.PNG"
             alt="Sagebrush Platform Dashboard"
             className="aspect-[3/2] object-cover lg:aspect-auto lg:size-full"
             width={1587}
