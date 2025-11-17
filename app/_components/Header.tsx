@@ -8,7 +8,9 @@ import Link from "next/link";
 
 const navigation = [
   { name: "Features", href: "/features" },
-  { name: "Company", href: "#" },
+  { name: "Company", href: "/company" },
+  { name: "FAQ", href: "/faq" },
+  
 ];
 
 export default function Header() {
