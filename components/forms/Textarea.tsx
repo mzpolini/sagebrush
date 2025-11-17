@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
