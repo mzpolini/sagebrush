@@ -95,7 +95,7 @@ export const subscriptions = pgTable("subscriptions", {
 });
 
 // Define relations
-export const usersRelations = relations(users, ({ one, many }) => ({
+export const usersRelations = relations(users, ({ one }) => ({
   applicantProfile: one(applicantProfiles, {
     fields: [users.id],
     references: [applicantProfiles.userId],

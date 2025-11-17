@@ -2,7 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/app/db/drizzle";
-import { users, investorProfiles, applicantProfiles, subscriptions } from "@/app/db/schema";
+import { users, investorProfiles, applicantProfiles } from "@/app/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
