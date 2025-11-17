@@ -2,20 +2,20 @@ import { Leaf } from 'lucide-react';
 
 const team = [
   {
-    name: 'Lori Glauser',
-    role: 'Co-Founder & CEO',
-    imageUrl:
-      'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80',
-    bio: 'Cannabis industry veteran with deep expertise in license applications and market analysis. Navigated the complexities of multi-state licensing and saw the need for data-driven decision making. Built Sagebrush to democratize access to probability intelligence.',
-    xUrl: '#',
-    linkedinUrl: '#',
-  },
-  {
     name: 'Carl Hairston',
     role: 'Co-Founder & Head of Data',
     imageUrl:
       'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80',
     bio: 'Data scientist and analytics expert specializing in competitive market modeling. Built the probability calculation engine that powers Sagebrush. Tracks legislation across 15+ states and translates complex regulations into actionable odds.',
+    xUrl: '#',
+    linkedinUrl: '#',
+  },
+  {
+    name: 'Lori Glauser',
+    role: 'Co-Founder & CEO',
+    imageUrl:
+      'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80',
+    bio: 'Cannabis industry veteran with deep expertise in license applications and market analysis. Navigated the complexities of multi-state licensing and saw the need for data-driven decision making. Built Sagebrush to democratize access to probability intelligence.',
     xUrl: '#',
     linkedinUrl: '#',
   },
