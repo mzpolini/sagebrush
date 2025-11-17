@@ -2,7 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/app/db/drizzle";
-import { users, investorProfiles, applicants } from "@/app/db/schema";
+import { users, investorProfiles, applicantProfiles } from "@/app/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -65,32 +65,56 @@ export async function updateUserProfile(formData: FormData) {
   return newUser[0];
 }
 
-export async function getUserProfile(userId: string) {
+export async function getUserProfile(clerkId?: string) {
+  // If no clerkId provided, get from auth
+  const { userId: authUserId } = await auth();
+  const userId = clerkId || authUserId;
+
   if (!userId) return null;
+
+  // Security check: only allow users to fetch their own profile
+  if (clerkId && clerkId !== authUserId) {
+    throw new Error("Unauthorized: Cannot access other user's profile");
+  }
 
   const user = await db
     .select()
     .from(users)
     .where(eq(users.clerkId, userId))
-    .execute();
-
-  if (!user?.[0]) return null;
-
-  return {
-    ...user[0],
-  };
-}
-
-export async function getApplicantProfile(userId: string) {
-  if (!userId) return null;
-
-  const applications = await db
-    .select()
-    .from(applicants)
-    .where(eq(applicants.userId, userId))
     .limit(1);
 
-  return applications.length > 0 ? applications[0] : null;
+  return user[0] || null;
+}
+
+export async function getApplicantProfile(clerkId?: string) {
+  // If no clerkId provided, get from auth
+  const { userId: authUserId } = await auth();
+  const userId = clerkId || authUserId;
+
+  if (!userId) return null;
+
+  // Security check: only allow users to fetch their own profile
+  if (clerkId && clerkId !== authUserId) {
+    throw new Error("Unauthorized: Cannot access other user's profile");
+  }
+
+  // First get the user's UUID from their clerkId
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.clerkId, userId))
+    .limit(1);
+
+  if (!user[0]) return null;
+
+  // Then get their applicant profile
+  const profile = await db
+    .select()
+    .from(applicantProfiles)
+    .where(eq(applicantProfiles.userId, user[0].id))
+    .limit(1);
+
+  return profile[0] || null;
 }
 
 export async function submitApplicantProfile(formData: FormData) {
@@ -102,43 +126,93 @@ export async function submitApplicantProfile(formData: FormData) {
 
   const data = Object.fromEntries(formData.entries());
 
-  // Extract the profile ID from the URL
-  const url = new URL(formData.get("url") as string);
-  const profileId = url.pathname.split("/")[2];
-
   try {
-    await db.insert(applicants).values({
-      userId,
-      profileId,
-      licenseType: data.licenseType as string,
-      experience: data.experience as string,
-      criminalHistory: (data.criminalHistory as string) || null,
-      financialInvestment: data.financialInvestment as string,
-      securityPlan: data.securityPlan as string,
-      businessPlan: data.businessPlan as string,
-      status: "pending",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+    // First get the user's UUID from their clerkId
+    const user = await db
+      .select()
+      .from(users)
+      .where(eq(users.clerkId, userId))
+      .limit(1);
 
-    revalidatePath(`/profile/${profileId}/applicant`);
-    redirect(`/profile/${profileId}/dashboard`);
+    if (!user[0]) {
+      throw new Error("User not found");
+    }
+
+    // Check if profile already exists
+    const existingProfile = await db
+      .select()
+      .from(applicantProfiles)
+      .where(eq(applicantProfiles.userId, user[0].id))
+      .limit(1);
+
+    if (existingProfile[0]) {
+      // Update existing profile
+      await db
+        .update(applicantProfiles)
+        .set({
+          licenseType: data.licenseType as string,
+          experience: data.experience as string,
+          criminalHistory: (data.criminalHistory as string) || null,
+          financialInvestment: data.financialInvestment as string,
+          securityPlan: data.securityPlan as string,
+          businessPlan: data.businessPlan as string,
+          status: "pending",
+          submittedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(applicantProfiles.id, existingProfile[0].id));
+    } else {
+      // Create new profile
+      await db.insert(applicantProfiles).values({
+        userId: user[0].id,
+        licenseType: data.licenseType as string,
+        experience: data.experience as string,
+        criminalHistory: (data.criminalHistory as string) || null,
+        financialInvestment: data.financialInvestment as string,
+        securityPlan: data.securityPlan as string,
+        businessPlan: data.businessPlan as string,
+        status: "pending",
+        submittedAt: new Date(),
+      });
+    }
+
+    revalidatePath("/profile");
+    redirect("/profile");
   } catch (error) {
     console.error("Error submitting application:", error);
     throw new Error("Failed to submit application. Please try again.");
   }
 }
 
-export async function getInvestorProfile(userId: string) {
+export async function getInvestorProfile(clerkId?: string) {
+  // If no clerkId provided, get from auth
+  const { userId: authUserId } = await auth();
+  const userId = clerkId || authUserId;
+
   if (!userId) return null;
 
-  const profiles = await db
+  // Security check: only allow users to fetch their own profile
+  if (clerkId && clerkId !== authUserId) {
+    throw new Error("Unauthorized: Cannot access other user's profile");
+  }
+
+  // First get the user's UUID from their clerkId
+  const user = await db
     .select()
-    .from(investorProfiles)
-    .where(eq(investorProfiles.userId, userId))
+    .from(users)
+    .where(eq(users.clerkId, userId))
     .limit(1);
 
-  return profiles.length > 0 ? profiles[0] : null;
+  if (!user[0]) return null;
+
+  // Then get their investor profile
+  const profile = await db
+    .select()
+    .from(investorProfiles)
+    .where(eq(investorProfiles.userId, user[0].id))
+    .limit(1);
+
+  return profile[0] || null;
 }
 
 export async function submitInvestorProfile(formData: FormData) {
@@ -150,20 +224,31 @@ export async function submitInvestorProfile(formData: FormData) {
 
   const data = Object.fromEntries(formData.entries());
 
-  // Extract the profile ID from the URL
-  const url = new URL(formData.get("url") as string);
-  const profileId = url.pathname.split("/")[2];
-
   // Convert preferredLocations from FormData to array
   const preferredLocationsEntries = Array.from(formData.entries())
     .filter(([key]) => key === "preferredLocations")
     .map(([, value]) => value as string);
 
   try {
-    // Check if profile already exists
-    const existingProfile = await getInvestorProfile(userId);
+    // First get the user's UUID from their clerkId
+    const user = await db
+      .select()
+      .from(users)
+      .where(eq(users.clerkId, userId))
+      .limit(1);
 
-    if (existingProfile) {
+    if (!user[0]) {
+      throw new Error("User not found");
+    }
+
+    // Check if profile already exists
+    const existingProfile = await db
+      .select()
+      .from(investorProfiles)
+      .where(eq(investorProfiles.userId, user[0].id))
+      .limit(1);
+
+    if (existingProfile[0]) {
       // Update existing profile
       await db
         .update(investorProfiles)
@@ -177,11 +262,11 @@ export async function submitInvestorProfile(formData: FormData) {
           riskTolerance: data.riskTolerance as string,
           updatedAt: new Date(),
         })
-        .where(eq(investorProfiles.id, existingProfile.id));
+        .where(eq(investorProfiles.id, existingProfile[0].id));
     } else {
       // Create new profile
       await db.insert(investorProfiles).values({
-        userId, // This is the Clerk user ID
+        userId: user[0].id, // Use the UUID from users table
         investmentRange: data.investmentRange as string,
         investmentStyle: data.investmentStyle as string,
         preferredLocations: preferredLocationsEntries,
@@ -189,13 +274,11 @@ export async function submitInvestorProfile(formData: FormData) {
         investmentGoals: data.investmentGoals as string,
         investmentHistory: data.investmentHistory as string,
         riskTolerance: data.riskTolerance as string,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       });
     }
 
-    revalidatePath(`/profile/${profileId}/investor`);
-    redirect(`/profile/${profileId}/dashboard`);
+    revalidatePath("/profile");
+    redirect("/profile");
   } catch (error) {
     console.error("Error submitting investor profile:", error);
     throw new Error("Failed to submit investor profile. Please try again.");

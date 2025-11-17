@@ -1,29 +1,36 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { syncUserWithDatabase } from "@/app/actions/auth";
 
-const isDashboardRoute = createRouteMatcher(["/profile(.*)"]);
-const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)"]);
+// Define route matchers
+const isProfileRoute = createRouteMatcher(["/profile(.*)"]);
+const isPublicRoute = createRouteMatcher([
+  "/",
+  "/features(.*)",
+  "/sign-in(.*)",
+  "/sign-up(.*)",
+  "/api/webhooks(.*)",
+]);
 
-export default clerkMiddleware(
-  async (auth, req) => {
-    const { userId, redirectToSignIn } = await auth();
+export default clerkMiddleware(async (auth, req) => {
+  const { userId } = await auth();
 
-    if (isPublicRoute(req)) return;
-
-    // Protect dashboard and other private routes
-    if (isDashboardRoute(req)) {
-      await auth.protect();
-      await fetch(new URL("/api/auth/sync", req.url), { method: "POST" });
-    }
-
-    // Optional: Redirect root to dashboard for authenticated users
-    if (req.nextUrl.pathname === "/" && userId) {
-      const dashboard = new URL(`/profile/${userId}/dashboard/`, req.url);
-      return Response.redirect(dashboard);
-    }
+  // Allow public routes
+  if (isPublicRoute(req)) {
+    return;
   }
-  // { debug: true }
-);
+
+  // Protect profile and app routes
+  if (isProfileRoute(req)) {
+    await auth.protect();
+    // Sync user with database
+    await fetch(new URL("/api/auth/sync", req.url), { method: "POST" });
+  }
+
+  // Redirect authenticated users from root to profile
+  if (req.nextUrl.pathname === "/" && userId) {
+    const profile = new URL("/profile", req.url);
+    return Response.redirect(profile);
+  }
+});
 
 export const config = {
   matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],

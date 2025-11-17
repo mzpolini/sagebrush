@@ -3,38 +3,39 @@ import {
   getInvestorProfile,
   getUserProfile,
 } from "@/app/actions/user";
-import { notFound } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 
-export default async function Dashboard({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = await params;
-  const user = await getUserProfile(id);
-  const investorProfile = await getInvestorProfile(id);
-  const applicantProfile = await getApplicantProfile(id);
+export default async function Dashboard() {
+  const { userId } = await auth();
+  if (!userId) {
+    redirect("/sign-in");
+  }
+
+  const user = await getUserProfile();
+  const investorProfile = await getInvestorProfile();
+  const applicantProfile = await getApplicantProfile();
 
   if (!user) {
-    notFound();
+    redirect("/sign-in");
   }
 
   // Calculate profile completion percentage
   const profileSections = [
     {
       name: "General Information",
-      path: `/profile/${params.id}/general`,
+      path: "/profile/general",
       completed: !!user.firstName,
     },
     {
       name: "Investor Details",
-      path: `/profile/${params.id}/investor`,
+      path: "/profile/investor",
       completed: !!investorProfile,
     },
     {
       name: "Applicant Details",
-      path: `/profile/${params.id}/applicant`,
+      path: "/profile/applicant",
       completed: !!applicantProfile,
     },
   ];

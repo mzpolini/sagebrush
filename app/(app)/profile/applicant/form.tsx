@@ -8,18 +8,18 @@ import { ChevronDownIcon } from "@heroicons/react/16/solid";
 
 interface Props {
   initialData?: {
-    id?: number;
+    id?: string;
     userId?: string;
-    profileId?: string;
-    licenseType?: string;
-    experience?: string;
+    licenseType?: string | null;
+    experience?: string | null;
     criminalHistory?: string | null;
-    financialInvestment?: string;
-    securityPlan?: string;
-    businessPlan?: string;
+    financialInvestment?: string | null;
+    securityPlan?: string | null;
+    businessPlan?: string | null;
     status?: string;
-    createdAt?: Date | null;
-    updatedAt?: Date | null;
+    submittedAt?: Date | null;
+    createdAt?: Date;
+    updatedAt?: Date;
   } | null;
 }
 
