@@ -44,13 +44,21 @@ export default function Header() {
             </button>
           </div>
         </div>
-        <Link href="/" className="-m-1.5 p-1.5">
+        <Link href="/" className="flex items-center gap-2 -m-1.5 p-1.5">
           <span className="sr-only">Sagebrush</span>
-          <img
-            alt=""
-            src="https://tailwindui.com/plus/img/logos/mark.svg?color=green&shade=600"
-            className="h-8 w-auto"
-          />
+          <svg width="32" height="32" viewBox="0 0 120 80" className="h-8 w-auto">
+            {/* Chart bars that look like growing plants */}
+            <rect x="10" y="50" width="15" height="30" fill="#22c55e" rx="2" opacity="0.6" />
+            <rect x="35" y="35" width="15" height="45" fill="#22c55e" rx="2" opacity="0.75" />
+            <rect x="60" y="20" width="15" height="60" fill="#22c55e" rx="2" opacity="0.9" />
+            <rect x="85" y="10" width="15" height="70" fill="#22c55e" rx="2" />
+            {/* Leaf on top of tallest bar */}
+            <circle cx="92" cy="8" r="6" fill="#10b981" />
+            <path d="M 92 8 Q 95 5 98 8" stroke="#10b981" strokeWidth="2" fill="none" />
+          </svg>
+          <span className="text-xl font-bold tracking-tight text-foreground hidden sm:block">
+            Sagebrush
+          </span>
         </Link>
         <div className="flex flex-1 justify-end">
           {isLoaded && (
@@ -94,13 +102,21 @@ export default function Header() {
                 <XMarkIcon aria-hidden="true" className="size-6" />
               </button>
             </div>
-            <Link href="/" className="-m-1.5 p-1.5">
-              <span className="sr-only">Sage Brush</span>
-              <img
-                alt=""
-                src="https://tailwindui.com/plus/img/logos/mark.svg?color=green&shade=600"
-                className="h-8 w-auto"
-              />
+            <Link href="/" className="flex items-center gap-2 -m-1.5 p-1.5">
+              <span className="sr-only">Sagebrush</span>
+              <svg width="32" height="32" viewBox="0 0 120 80" className="h-8 w-auto">
+                {/* Chart bars that look like growing plants */}
+                <rect x="10" y="50" width="15" height="30" fill="#22c55e" rx="2" opacity="0.6" />
+                <rect x="35" y="35" width="15" height="45" fill="#22c55e" rx="2" opacity="0.75" />
+                <rect x="60" y="20" width="15" height="60" fill="#22c55e" rx="2" opacity="0.9" />
+                <rect x="85" y="10" width="15" height="70" fill="#22c55e" rx="2" />
+                {/* Leaf on top of tallest bar */}
+                <circle cx="92" cy="8" r="6" fill="#10b981" />
+                <path d="M 92 8 Q 95 5 98 8" stroke="#10b981" strokeWidth="2" fill="none" />
+              </svg>
+              <span className="text-xl font-bold tracking-tight text-foreground">
+                Sagebrush
+              </span>
             </Link>
             <div className="flex flex-1 justify-end">
               {isLoaded && user ? (
